@@ -17,11 +17,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "value": return value_option(query)
-    elif query.data == "alarm": return alarm_option(query)
-    elif query.data == "chart": return chart_option(query)
-    elif query.data == "review": return review_option(query)
-    elif query.data == "back": return back(query)
+    if query.data == "value": value_option(query)
+    elif query.data == "alarm": alarm_option(query)
+    elif query.data == "chart": chart_option(query)
+    elif query.data == "review": review_option(query)
+    elif query.data == "back": back(query)
     else: await context.bot.wrong_method_name()
 
 async def value_option(query):
