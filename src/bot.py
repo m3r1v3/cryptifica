@@ -65,6 +65,11 @@ async def back(query):
     )
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+        [InlineKeyboardButton("💲", callback_data="value"), InlineKeyboardButton("🔔", callback_data="alarm")],
+        [InlineKeyboardButton("📈", callback_data="chart"), InlineKeyboardButton("📝", callback_data="review")],
+    ]
+    
     await context.bot.send_message(
         text=f'Something went wrong ⚠\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost\n📈 Show price chart\n📝 Daily reviews',
             reply_markup=InlineKeyboardMarkup(keyboard)
