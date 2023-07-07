@@ -17,11 +17,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "value": value_option(query)
-    elif query.data == "alarm": alarm_option(query)
-    elif query.data == "chart": chart_option(query)
-    elif query.data == "review": review_option(query)
-    elif query.data == "back": back(query)
+    if query.data == "value": await value_option(query)
+    elif query.data == "alarm": await alarm_option(query)
+    elif query.data == "chart": await chart_option(query)
+    elif query.data == "review": await review_option(query)
+    elif query.data == "back": await back(query)
 
 async def value_option(query):
     keyboard = [
