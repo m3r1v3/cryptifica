@@ -21,7 +21,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == "alarm": return alarm_option(query)
     elif query.data == "chart": return chart_option(query)
     elif query.data == "review": return review_option(query)
-    elif query.data == "back":
+    elif query.data == "back": return back(query)
     else: await context.bot.wrong_method_name()
 
 def value_option(query):
