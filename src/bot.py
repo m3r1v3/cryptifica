@@ -65,7 +65,7 @@ async def back(query):
     )
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
+    await update.callback_query.message.edit_text(
             f'Something went wrong ⚠\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost\n📈 Show price chart\n📝 Daily reviews',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
