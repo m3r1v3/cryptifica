@@ -11,7 +11,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ]
     
     await update.message.reply_text(
-        f'Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost⭐ Favorite cryptocurrencies\n📈 Show price chart\n📝 Daily reviews\nℹ About Cryptifica',
+        f'Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\n📈 Show price chart\n📝 Daily reviews\nℹ About Cryptifica',
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -60,7 +60,7 @@ async def home(query):
     
     await query.answer()
     await query.edit_message_text(
-        text=f'Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost\n📈 Show price chart\n📝 Daily reviews',
+        text=f'Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\n📈 Show price chart\n📝 Daily reviews\nℹ About Cryptifica',
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
