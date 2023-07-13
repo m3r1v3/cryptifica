@@ -22,6 +22,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == "chart": await chart_option(query)
     elif query.data == "review": await review_option(query)
     elif query.data == "home": await home(query)
+    elif query.data == "favorites": await favorites(query)
     elif query.data == "info": await info(query)
 
 async def value_option(query):
@@ -70,6 +71,13 @@ async def info(query):
     ]
     await query.answer()
     await query.edit_message_text(text=f"ℹ About Cryptifica", reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def favorites(query):
+    keyboard = [
+        [InlineKeyboardButton("🌟", callback_data="add_favorite"), InlineKeyboardButton("🗑", callback_data="home"), InlineKeyboardButton("🏠", callback_data="home")],
+    ]
+    await query.answer()
+    await query.edit_message_text(text=f"⭐ Favorite cryptocurrencies\n\nYour favorites ⭐\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back", reply_markup=InlineKeyboardMarkup(keyboard))
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(os.environ.get('BOT_TOKEN')).build()
