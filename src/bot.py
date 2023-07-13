@@ -1,6 +1,6 @@
 import os
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ParseMode
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 
 
@@ -79,7 +79,7 @@ async def favorites(query):
     await query.answer()
     await query.edit_message_text(
         text=f"⭐ Favorite cryptocurrencies\n\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back",
-        parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
+        parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 if __name__ == "__main__":
