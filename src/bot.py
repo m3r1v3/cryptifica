@@ -12,7 +12,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ]
     
     await update.message.reply_text(
-        f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
+        f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -62,7 +62,7 @@ async def home(query):
     
     await query.answer()
     await query.edit_message_text(
-        text=f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
+        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -79,7 +79,7 @@ async def favorites(query):
     ]
     await query.answer()
     await query.edit_message_text(
-        text=f"⭐ Favorite cryptocurrencies\n\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back",
+        text=f"⭐ Favorite cryptocurrencies\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
