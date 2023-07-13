@@ -77,7 +77,7 @@ async def favorites(query):
         [InlineKeyboardButton("🌟", callback_data="add_favorite"), InlineKeyboardButton("🗑", callback_data="home"), InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"⭐ Favorite cryptocurrencies\n\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour favorites ⭐\n\n<i>You haven't added your favorite cryptocurrencies yet</i>\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"⭐ Favorite cryptocurrencies\n\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to favorite\n🗑 Remove from favorite\n🏠 Back", reply_markup=InlineKeyboardMarkup(keyboard))
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
