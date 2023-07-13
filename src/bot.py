@@ -71,7 +71,9 @@ async def info(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"ℹ About Cryptifica", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"ℹ About Cryptifica\n\n_This feature is currently under development, please check back soon_ 🐘",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def favorites(query):
     keyboard = [
