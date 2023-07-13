@@ -6,12 +6,12 @@ from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandle
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("💲", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"), InlineKeyboardButton("📝", callback_data="review")],
+        [InlineKeyboardButton("💰", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"), InlineKeyboardButton("📝", callback_data="review")],
         [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"), InlineKeyboardButton("ℹ", callback_data="info")],
     ]
     
     await update.message.reply_text(
-        f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
+        f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -30,7 +30,7 @@ async def value_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💲 Current price", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"💰 Current price", reply_markup=InlineKeyboardMarkup(keyboard))
     
 async def alarm_option(query):
     keyboard = [
@@ -55,13 +55,13 @@ async def review_option(query):
 
 async def home(query):
     keyboard = [
-        [InlineKeyboardButton("💲", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"), InlineKeyboardButton("📝", callback_data="review")],
+        [InlineKeyboardButton("💰", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"), InlineKeyboardButton("📝", callback_data="review")],
         [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"), InlineKeyboardButton("ℹ", callback_data="info")],
     ]
     
     await query.answer()
     await query.edit_message_text(
-        text=f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💲 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
+        text=f"Welcome to Cryptifica 👋🏻\n\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite cryptocurrencies\nℹ About Cryptifica",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
