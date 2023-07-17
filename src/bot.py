@@ -9,15 +9,14 @@ from crypto import get_price, get_symbol
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
-         InlineKeyboardButton("📝", callback_data="review")],
-        [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
-         InlineKeyboardButton("ℹ", callback_data="info")],
+        [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
+         InlineKeyboardButton("📝 Review", callback_data="review")],
+        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"), InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+         InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
     await update.message.reply_text(
-        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 "
-             f"_Price_\n📈 _Сhart_\n📝 _Review_\n🔔 _Notify_\n⭐ _Favorites_\nℹ _About_",
+        text=f"Welcome to Cryptifica 👋🏻\n_Your personal cryptocurrency checker bot_ 🤖💰\n\nSelect option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -25,16 +24,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def home(query):
     keyboard = [
-        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
-         InlineKeyboardButton("📝", callback_data="review")],
-        [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
-         InlineKeyboardButton("ℹ", callback_data="info")],
+        [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
+         InlineKeyboardButton("📝 Review", callback_data="review")],
+        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"), InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+         InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
     await query.answer()
     await query.edit_message_text(
-        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 "
-             f"_Price_\n📈 _Сhart_\n📝 _Review_\n🔔 _Notify_\n⭐ _Favorites_\nℹ _About_",
+        text=f"Welcome to Cryptifica 👋🏻\n_Your personal cryptocurrency checker bot_ 🤖💰\n\nSelect option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
