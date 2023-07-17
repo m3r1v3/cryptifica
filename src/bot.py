@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
-from crypto import get_price, get_name
+from crypto import get_price, get_symbol
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -77,7 +77,7 @@ async def price_option_next(query):
 
 async def show_price(query):
     price = get_price(query.data[6:], "usd", 1)
-    name = get_name(query.data[6:]).upper()
+    name = get_symbol(query.data[6:]).upper()
 
     keyboard = [
         [InlineKeyboardButton("🏠", callback_data="home")],
