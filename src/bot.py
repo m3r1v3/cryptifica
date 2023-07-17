@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
-from crypto import get_price, get_symbol
+from crypto import get_price, get_symbol, get_change_percent
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -96,12 +96,13 @@ async def price_option_next(query):
 async def show_price(query):
     price = get_price(query.data[6:])
     name = get_symbol(query.data[6:]).upper()
+    percent = '{0:.{1}f}'.format(get_change_percent(float(query.data[6:])), 4)
 
     keyboard = [
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price}",
+    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price} 💸\nCost changed to {percent} in 24 hours {'📈' if percent[0] == '+' else '📉'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
