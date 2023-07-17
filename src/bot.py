@@ -4,10 +4,12 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
+from crypto import get_price, get_name
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("💰", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"),
+        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
          InlineKeyboardButton("📝", callback_data="review")],
         [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
          InlineKeyboardButton("ℹ", callback_data="info")],
@@ -23,8 +25,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "value":
-        await value_option(query)
+    if query.data == "price":
+        await price_option(query)
+    elif query.data == "price_next":
+        await price_option_next(query)
+    elif query.data[:6] == "price_":
+        await show_price(query)
     elif query.data == "alarm":
         await alarm_option(query)
     elif query.data == "chart":
@@ -39,12 +45,46 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await info(query)
 
 
-async def value_option(query):
+async def price_option(query):
+    keyboard = [
+        [InlineKeyboardButton("ETH", callback_data="price_etherium"),
+         InlineKeyboardButton("BTC", callback_data="price_bitcoin"),
+         InlineKeyboardButton("USDT", callback_data="price_usdt")],
+        [InlineKeyboardButton("USDC", callback_data="price_usdc"),
+         InlineKeyboardButton("SOL", callback_data="price_sol"),
+         InlineKeyboardButton("TON", callback_data="price_toncoin")],
+        [InlineKeyboardButton("🏠", callback_data="home"), InlineKeyboardButton("▶", callback_data="price_next")],
+    ]
+    await query.answer()
+    await query.edit_message_text(text=f"💰 Current price\n\nSelect cryptocurrency 💬",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def price_option_next(query):
+    keyboard = [
+        [InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
+         InlineKeyboardButton("MARIC", callback_data="price_matic-network"),
+         InlineKeyboardButton("LTC", callback_data="price_litecoin")],
+        [InlineKeyboardButton("DOT", callback_data="price_polkadot"),
+         InlineKeyboardButton("DAI", callback_data="price_dai"),
+         InlineKeyboardButton("XMR", callback_data="price_monero")],
+        [InlineKeyboardButton("◀", callback_data="price"), InlineKeyboardButton("🏠", callback_data="home")],
+    ]
+    await query.answer()
+    await query.edit_message_text(text=f"💰 Current price\n\nSelect cryptocurrency 💬",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def show_price(query):
+    price = get_price(query.data[6:], "usd", 1)
+    name = get_name(query.data[6:]).upper()
+
     keyboard = [
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current price", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is ${price}",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def alarm_option(query):
@@ -73,7 +113,7 @@ async def review_option(query):
 
 async def home(query):
     keyboard = [
-        [InlineKeyboardButton("💰", callback_data="value"), InlineKeyboardButton("📈", callback_data="chart"),
+        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
          InlineKeyboardButton("📝", callback_data="review")],
         [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
          InlineKeyboardButton("ℹ", callback_data="info")],
