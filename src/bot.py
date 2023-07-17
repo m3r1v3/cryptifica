@@ -76,14 +76,15 @@ async def price_option_next(query):
 
 
 async def show_price(query):
-    price = get_price(query.data[6:], "usd", 1)
+    price = get_price(query.data[6:])
     name = get_symbol(query.data[6:]).upper()
 
     keyboard = [
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is ${price}",
+    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is *${price}*",
+                                  parse_mode=ParseMode.MARKDOWN_V2,
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
