@@ -63,7 +63,7 @@ async def price_option(query):
 async def price_option_next(query):
     keyboard = [
         [InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
-         InlineKeyboardButton("MARIC", callback_data="price_matic-network"),
+         InlineKeyboardButton("MATIC", callback_data="price_matic-network"),
          InlineKeyboardButton("LTC", callback_data="price_litecoin")],
         [InlineKeyboardButton("DOT", callback_data="price_polkadot"),
          InlineKeyboardButton("DAI", callback_data="price_dai"),
