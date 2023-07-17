@@ -83,7 +83,7 @@ async def show_price(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is *${price}*",
+    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is _${price}_",
                                   parse_mode=ParseMode.MARKDOWN_V2,
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
