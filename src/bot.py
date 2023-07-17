@@ -56,7 +56,7 @@ async def price_option(query):
         [InlineKeyboardButton("🏠", callback_data="home"), InlineKeyboardButton("▶", callback_data="price_next")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current price\n\nSelect cryptocurrency 💬",
+    await query.edit_message_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -71,7 +71,7 @@ async def price_option_next(query):
         [InlineKeyboardButton("◀", callback_data="price"), InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current price\n\nSelect cryptocurrency 💬",
+    await query.edit_message_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -83,7 +83,7 @@ async def show_price(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is ${price}",
+    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -92,7 +92,8 @@ async def alarm_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"🔔 Notify", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"🔔 Notify\n\n_This feature is currently under development, please check back soon_ 🐘",
+                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def chart_option(query):
@@ -100,7 +101,8 @@ async def chart_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"📈 Price chart", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"📈 Price chart\n\n_This feature is currently under development, please check back soon_ 🐘",
+                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def review_option(query):
@@ -108,7 +110,8 @@ async def review_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"📝 Daily review", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(text=f"📝 Daily review\n\n_This feature is currently under development, please check back soon_ 🐘",
+                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def home(query):
