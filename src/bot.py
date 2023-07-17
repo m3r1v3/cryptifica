@@ -92,7 +92,7 @@ async def alarm_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"🔔 Notify\n\n_This feature is currently under development, please check back soon_ 🐘",
+    await query.edit_message_text(text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
                                   parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -110,7 +110,7 @@ async def review_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"📝 Daily review\n\n_This feature is currently under development, please check back soon_ 🐘",
+    await query.edit_message_text(text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
                                   parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -137,7 +137,7 @@ async def info(query):
     ]
     await query.answer()
     await query.edit_message_text(
-        text=f"ℹ About Cryptifica\n\n_This feature is currently under development, please check back soon_ 🐘",
+        text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -149,7 +149,7 @@ async def favorites(query):
     ]
     await query.answer()
     await query.edit_message_text(
-        text=f"⭐ Favorite cryptocurrencies\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour "
+        text=f"Your favorite cryptocurrencies ⭐\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour "
              f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to "
              f"favorite\n🗑 Remove from favorite\n🏠 Back",
         parse_mode=ParseMode.MARKDOWN_V2,
