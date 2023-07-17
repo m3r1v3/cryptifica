@@ -2,20 +2,12 @@ import requests
 import pandas as pd
 import datetime
 
-def check_available(coin_id: str):
-    response = requests.get(f"https://api.coingecko.com/api/v3/coins/list")
-    return coin_id in [asset["id"] for asset in response.json()]
-
 def get_symbol(coin_id: str) -> str:
-    if check_available(coin_id):
-        response = requests.get(f"https://api.coingecko.com/api/v3/coins/{coin_id}")
-        return response.json()["symbol"]
+    response = requests.get(f"https://api.coincap.io/v2/assets/{coin_id}")
+    return response.json()["data"]["symbol"]
 
-def get_price(coin_id: str, vs_currency="usd", days=0, interval="daily"):
-    if check_available(coin_id):
-        url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-        payload = {"vs_currency": vs_currency, "days": days, "interval": interval}
-        response = requests.get(url, params=payload)
-        data = response.json()
-        
-        return data["prices"][-1][1]
+def get_price(coin_id: str):
+    response = requests.get(f"https://api.coincap.io/v2/assets/{coin_id}")
+    return response.json()["data"]["priceUsd"]
+
+print(get_symbol("bitcoin"))
