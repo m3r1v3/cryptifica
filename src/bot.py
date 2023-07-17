@@ -102,7 +102,7 @@ async def show_price(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price} 💸\nCost changed to {percent} in 24 hours {'📈' if percent[0] == '+' else '📉'}",
+    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price} 💸\nCost changed to {percent} in 24 hours {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
