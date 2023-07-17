@@ -47,12 +47,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def price_option(query):
     keyboard = [
-        [InlineKeyboardButton("ETH", callback_data="price_etherium"),
+        [InlineKeyboardButton("ETH", callback_data="price_ethereum"),
          InlineKeyboardButton("BTC", callback_data="price_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data="price_usdt")],
-        [InlineKeyboardButton("USDC", callback_data="price_usdc"),
-         InlineKeyboardButton("SOL", callback_data="price_sol"),
-         InlineKeyboardButton("TON", callback_data="price_toncoin")],
+         InlineKeyboardButton("USDT", callback_data="price_tether")],
+        [InlineKeyboardButton("USDC", callback_data="price_usd-coin"),
+         InlineKeyboardButton("SOL", callback_data="price_solana"),
+         InlineKeyboardButton("DAI", callback_data="price_multi-collateral-dai")],
         [InlineKeyboardButton("🏠", callback_data="home"), InlineKeyboardButton("▶", callback_data="price_next")],
     ]
     await query.answer()
@@ -63,10 +63,10 @@ async def price_option(query):
 async def price_option_next(query):
     keyboard = [
         [InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data="price_matic-network"),
+         InlineKeyboardButton("MATIC", callback_data="price_polygon"),
          InlineKeyboardButton("LTC", callback_data="price_litecoin")],
         [InlineKeyboardButton("DOT", callback_data="price_polkadot"),
-         InlineKeyboardButton("DAI", callback_data="price_dai"),
+         InlineKeyboardButton("SHIB", callback_data="price_shiba-inu"),
          InlineKeyboardButton("XMR", callback_data="price_monero")],
         [InlineKeyboardButton("◀", callback_data="price"), InlineKeyboardButton("🏠", callback_data="home")],
     ]
@@ -83,8 +83,7 @@ async def show_price(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is _${price}_",
-                                  parse_mode=ParseMode.MARKDOWN_V2,
+    await query.edit_message_text(text=f"💰 Current {name} price\n\nAt the current time, the cost of {name} is ${price}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
