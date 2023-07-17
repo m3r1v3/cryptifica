@@ -11,7 +11,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"), InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
+         InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
@@ -26,7 +27,8 @@ async def home(query):
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"), InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
+         InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
@@ -68,7 +70,8 @@ async def price_option(query):
         [InlineKeyboardButton("USDC", callback_data="price_usd-coin"),
          InlineKeyboardButton("SOL", callback_data="price_solana"),
          InlineKeyboardButton("DAI", callback_data="price_multi-collateral-dai")],
-        [InlineKeyboardButton("🏠", callback_data="home"), InlineKeyboardButton("▶", callback_data="price_next")],
+        [InlineKeyboardButton("🏠 Home", callback_data="home"),
+         InlineKeyboardButton("▶ Next", callback_data="price_next")],
     ]
     await query.answer()
     await query.edit_message_text(text=f"Select cryptocurrency 💬",
@@ -83,7 +86,7 @@ async def price_option_next(query):
         [InlineKeyboardButton("DOT", callback_data="price_polkadot"),
          InlineKeyboardButton("SHIB", callback_data="price_shiba-inu"),
          InlineKeyboardButton("XMR", callback_data="price_monero")],
-        [InlineKeyboardButton("◀", callback_data="price"), InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.edit_message_text(text=f"Select cryptocurrency 💬",
@@ -104,7 +107,7 @@ async def show_price(query):
 
 async def alarm_option(query):
     keyboard = [
-        [InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.edit_message_text(
@@ -114,7 +117,7 @@ async def alarm_option(query):
 
 async def chart_option(query):
     keyboard = [
-        [InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.edit_message_text(
@@ -124,7 +127,7 @@ async def chart_option(query):
 
 async def review_option(query):
     keyboard = [
-        [InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.edit_message_text(
@@ -132,27 +135,28 @@ async def review_option(query):
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def info(query):
-    keyboard = [
-        [InlineKeyboardButton("🏠", callback_data="home")],
-    ]
-    await query.answer()
-    await query.edit_message_text(
-        text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
-        parse_mode=ParseMode.MARKDOWN_V2,
-        reply_markup=InlineKeyboardMarkup(keyboard))
-
-
 async def favorites(query):
     keyboard = [
-        [InlineKeyboardButton("🌟", callback_data="add_favorite"), InlineKeyboardButton("🗑", callback_data="home"),
-         InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("🌟 Add", callback_data="add_favorite"),
+         InlineKeyboardButton("🗑 Remove", callback_data="remove_favorite"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.edit_message_text(
         text=f"Your favorite cryptocurrencies ⭐\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour "
              f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to "
              f"favorite\n🗑 Remove from favorite\n🏠 Back",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def info(query):
+    keyboard = [
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+    await query.answer()
+    await query.edit_message_text(
+        text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
