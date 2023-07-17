@@ -16,9 +16,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ]
 
     await update.message.reply_text(
-        f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 Show "
-        f"current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite "
-        f"cryptocurrencies\nℹ About Cryptifica",
+        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 "
+             f"_Price_\n📈 _Сhart_\n📝 _Review_\n🔔 _Notify_\n⭐ _Favorites_\nℹ _About_",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+async def home(query):
+    keyboard = [
+        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
+         InlineKeyboardButton("📝", callback_data="review")],
+        [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
+         InlineKeyboardButton("ℹ", callback_data="info")],
+    ]
+
+    await query.answer()
+    await query.edit_message_text(
+        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 "
+             f"_Price_\n📈 _Сhart_\n📝 _Review_\n🔔 _Notify_\n⭐ _Favorites_\nℹ _About_",
+        parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -92,8 +109,9 @@ async def alarm_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
-                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(
+        text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
+        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def chart_option(query):
@@ -101,8 +119,9 @@ async def chart_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"📈 Price chart\n\n_This feature is currently under development, please check back soon_ 🐘",
-                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text(
+        text=f"📈 Price chart\n\n_This feature is currently under development, please check back soon_ 🐘",
+        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def review_option(query):
@@ -110,25 +129,9 @@ async def review_option(query):
         [InlineKeyboardButton("🏠", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
-                                  parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def home(query):
-    keyboard = [
-        [InlineKeyboardButton("💰", callback_data="price"), InlineKeyboardButton("📈", callback_data="chart"),
-         InlineKeyboardButton("📝", callback_data="review")],
-        [InlineKeyboardButton("🔔", callback_data="alarm"), InlineKeyboardButton("⭐", callback_data="favorites"),
-         InlineKeyboardButton("ℹ", callback_data="info")],
-    ]
-
-    await query.answer()
     await query.edit_message_text(
-        text=f"Welcome to Cryptifica 👋🏻\nYour personal cryptocurrency checker bot 🤖💰\n\nSelect option 💬\n\n💰 "
-             f"Show current price\n📈 Show price chart\n📝 Daily reviews\n🔔 Notify about the cost\n⭐ Favorite "
-             f"cryptocurrencies\nℹ About Cryptifica",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+        text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
+        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def info(query):
