@@ -110,9 +110,9 @@ async def show_price(query):
         [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of"
+    await query.edit_message_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
                                   f"{symbol} is  ${price} 💸\n"
-                                  f"Price changed to {percent}%"
+                                  f"Price changed to {percent}% "
                                   f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -152,6 +152,8 @@ async def chart_option_next(query):
 
 
 async def show_chart(query):
+    create_images_folder()
+
     data = get_data(query.data[6:])
     chart = get_chart(query.data[6:])
 
@@ -165,6 +167,17 @@ async def show_chart(query):
     await query.send_photo(open(f"images/{chart}.webp", "rb"))
     await query.edit_message_text(text=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
+    delete_image(f"images/{chart}.webp")
+
+
+def create_images_folder():
+    if not os.path.exists("/images"):
+        os.makedirs("/images")
+
+
+def delete_image(file_name: str):
+    if os.path.exists(f"images/{file_name}"):
+        os.remove(f"images/{file_name}")
 
 
 async def alarm_option(query):
