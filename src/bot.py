@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
-from crypto import get_price, get_symbol, get_change_percent
+from crypto import get_price, get_symbol, get_change_percent, get_name
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -66,13 +66,14 @@ async def price_option(query):
     keyboard = [
         [InlineKeyboardButton("ETH", callback_data="price_ethereum"),
          InlineKeyboardButton("BTC", callback_data="price_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data="price_tether")],
-        [InlineKeyboardButton("USDC", callback_data="price_usd-coin"),
-         InlineKeyboardButton("SOL", callback_data="price_solana"),
-         InlineKeyboardButton("DAI", callback_data="price_multi-collateral-dai")],
+         InlineKeyboardButton("USDT", callback_data="price_tether"),
+         InlineKeyboardButton("USDC", callback_data="price_usd-coin")],
+        [InlineKeyboardButton("SOL", callback_data="price_solana"),
+         InlineKeyboardButton("DAI", callback_data="price_multi-collateral-dai"),
+         InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
+         InlineKeyboardButton("MATIC", callback_data="price_polygon")],
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
-         InlineKeyboardButton("▶ Next", callback_data="price_next")],
-    ]
+         InlineKeyboardButton("▶ Next", callback_data="price_next")]]
     await query.answer()
     await query.edit_message_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
@@ -80,14 +81,16 @@ async def price_option(query):
 
 async def price_option_next(query):
     keyboard = [
-        [InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data="price_polygon"),
-         InlineKeyboardButton("LTC", callback_data="price_litecoin")],
-        [InlineKeyboardButton("DOT", callback_data="price_polkadot"),
+        [InlineKeyboardButton("LTC", callback_data="price_litecoin"),
+         InlineKeyboardButton("DOT", callback_data="price_polkadot"),
          InlineKeyboardButton("SHIB", callback_data="price_shiba-inu"),
          InlineKeyboardButton("XMR", callback_data="price_monero")],
-        [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
-    ]
+        [InlineKeyboardButton("XRP", callback_data="price_xrp"),
+         InlineKeyboardButton("TRON", callback_data="price_tron"),
+         InlineKeyboardButton("BUSD", callback_data="price_binance-usd"),
+         InlineKeyboardButton("UNI", callback_data="price_uniswap")],
+        [InlineKeyboardButton("◀ Back", callback_data="price"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
     await query.edit_message_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
@@ -95,14 +98,16 @@ async def price_option_next(query):
 
 async def show_price(query):
     price = get_price(query.data[6:])
-    name = get_symbol(query.data[6:]).upper()
+    name = get_name(query.data[6:]).title()
+    symbol = get_symbol(query.data[6:]).upper()
     percent = '{0:.{1}f}'.format(float(get_change_percent(query.data[6:])), 4)
 
     keyboard = [
-        [InlineKeyboardButton("🏠", callback_data="home")],
+        [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} price 💰\n\nAt the current time, the cost of {name} is ${price} 💸\nCost changed to {percent} in 24 hours {'📉' if percent[0] == '-' else '📈'}",
+    await query.edit_message_text(text=f"{name} ({symbol}) price 💰\n\nAt the current time, the price of {symbol} is "
+                                  f"${price} 💸\nPrice changed to {percent} in 24 hours {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
