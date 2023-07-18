@@ -5,6 +5,7 @@ from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandle
 from telegram.constants import ParseMode
 
 from crypto import get_data
+from chart import get_chart
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -55,7 +56,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == "chart_next":
         await chart_option_next(query)
     elif query.data[:6] == "chart_":
-        pass
+        await show_chart(query)
     elif query.data == "review":
         await review_option(query)
     elif query.data == "home":
@@ -147,6 +148,22 @@ async def chart_option_next(query):
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
     await query.edit_message_text(text=f"Select cryptocurrency 💬",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def show_chart(query):
+    data = get_data(query.data[6:])
+    chart = get_chart(query.data[6:])
+
+    name, symbol = data['name'], data['symbol']
+    percent = '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
+
+    keyboard = [
+        [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+    await query.answer()
+    await query.send_photo(open(f"images/{chart}.webp", "rb"))
+    await query.edit_message_text(text=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
