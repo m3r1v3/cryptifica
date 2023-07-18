@@ -1,6 +1,6 @@
 import os
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
@@ -164,10 +164,10 @@ async def show_chart(query):
         [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.send_photo(open(f"images/{chart}.webp", "rb"))
+    # await query.message.send_media(media=InputMediaPhoto(media=open(f"images\\{chart}.webp", "rb")))
+    delete_image(chart)
     await query.edit_message_text(text=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
-    delete_image(f"images/{chart}.webp")
 
 
 def create_images_folder():
@@ -176,8 +176,8 @@ def create_images_folder():
 
 
 def delete_image(file_name: str):
-    if os.path.exists(f"images/{file_name}"):
-        os.remove(f"images/{file_name}")
+    if os.path.isfile(f"images/{file_name}.webp"):
+        os.remove(f"images/{file_name}.webp")
 
 
 async def alarm_option(query):
