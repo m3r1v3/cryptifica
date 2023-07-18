@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
-from crypto import get_price, get_symbol, get_change_percent, get_name
+from crypto import get_data
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -52,6 +52,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await alarm_option(query)
     elif query.data == "chart":
         await chart_option(query)
+    elif query.data == "chart_next":
+        await chart_option_next(query)
+    elif query.data[:6] == "chart_":
+        pass
     elif query.data == "review":
         await review_option(query)
     elif query.data == "home":
@@ -97,17 +101,52 @@ async def price_option_next(query):
 
 
 async def show_price(query):
-    price = get_price(query.data[6:])
-    name = get_name(query.data[6:])
-    symbol = get_symbol(query.data[6:]).upper()
-    percent = '{0:.{1}f}'.format(float(get_change_percent(query.data[6:])), 4)
+    data = get_data(query.data[6:])
+    name, symbol = data['name'], data['symbol']
+    price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of {symbol} is "
-                                  f"${price} 💸\nPrice changed to {percent} in 24 hours {'📉' if percent[0] == '-' else '📈'}",
+    await query.edit_message_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of"
+                                  f"{symbol} is  ${price} 💸\n"
+                                  f"Price changed to {percent}%"
+                                  f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def chart_option(query):
+    keyboard = [
+        [InlineKeyboardButton("ETH", callback_data="chart_ethereum"),
+         InlineKeyboardButton("BTC", callback_data="chart_bitcoin"),
+         InlineKeyboardButton("USDT", callback_data="chart_tether"),
+         InlineKeyboardButton("USDC", callback_data="chart_usd-coin")],
+        [InlineKeyboardButton("SOL", callback_data="chart_solana"),
+         InlineKeyboardButton("DAI", callback_data="chart_multi-collateral-dai"),
+         InlineKeyboardButton("DOGE", callback_data="chart_dogecoin"),
+         InlineKeyboardButton("MATIC", callback_data="chart_polygon")],
+        [InlineKeyboardButton("🏠 Home", callback_data="home"),
+         InlineKeyboardButton("▶ Next", callback_data="chart_next")]]
+    await query.answer()
+    await query.edit_message_text(text=f"Select cryptocurrency 💬",
+                                  reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def chart_option_next(query):
+    keyboard = [
+        [InlineKeyboardButton("LTC", callback_data="chart_litecoin"),
+         InlineKeyboardButton("DOT", callback_data="chart_polkadot"),
+         InlineKeyboardButton("SHIB", callback_data="chart_shiba-inu"),
+         InlineKeyboardButton("XMR", callback_data="chart_monero")],
+        [InlineKeyboardButton("XRP", callback_data="chart_xrp"),
+         InlineKeyboardButton("TRON", callback_data="chart_tron"),
+         InlineKeyboardButton("BUSD", callback_data="chart_binance-usd"),
+         InlineKeyboardButton("UNI", callback_data="chart_uniswap")],
+        [InlineKeyboardButton("◀ Back", callback_data="chart"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]]
+    await query.answer()
+    await query.edit_message_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -118,16 +157,6 @@ async def alarm_option(query):
     await query.answer()
     await query.edit_message_text(
         text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
-        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def chart_option(query):
-    keyboard = [
-        [InlineKeyboardButton("🏠 Home", callback_data="home")],
-    ]
-    await query.answer()
-    await query.edit_message_text(
-        text=f"📈 Price chart\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
