@@ -98,7 +98,7 @@ async def price_option_next(query):
 
 async def show_price(query):
     price = get_price(query.data[6:])
-    name = get_name(query.data[6:]).title()
+    name = get_name(query.data[6:])
     symbol = get_symbol(query.data[6:]).upper()
     percent = '{0:.{1}f}'.format(float(get_change_percent(query.data[6:])), 4)
 
