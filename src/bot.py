@@ -171,7 +171,7 @@ async def show_chart(query):
     ]
     await query.answer()
     await query.message.delete()
-    await query.message.reply_photo(photo=open(f"images\\{chart}.webp", "rb"),
+    await query.message.reply_photo(photo=open(f"images/{chart}.webp", "rb"),
                                    caption=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
     delete_image(chart)
