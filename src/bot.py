@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMe
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
-from crypto import get_data
+from crypto import get_data, get_prices
 from chart import get_chart
 
 
@@ -161,7 +161,10 @@ async def show_chart(query):
     create_images_folder()
 
     data = get_data(query.data[6:])
-    chart = get_chart(query.data[6:])
+
+    datas, prices = get_prices(query.data[6:])
+
+    chart = get_chart(datas, prices)
 
     name, symbol = data['name'], data['symbol']
     percent = '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
@@ -172,8 +175,8 @@ async def show_chart(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_photo(photo=open(f"images/{chart}.webp", "rb"),
-                                   caption=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+                                    caption=f"{name} ({symbol}) {'📉' if prices[0] > prices[-1] else '📈'}",
+                                    reply_markup=InlineKeyboardMarkup(keyboard))
     delete_image(chart)
 
 

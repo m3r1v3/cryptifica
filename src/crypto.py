@@ -7,7 +7,7 @@ def get_data(coin_id: str):
 
 
 def get_prices(coin_id: str):
-    data = requests.get(f"https://api.coincap.io/v2/assets/{coin_id}/history?interval=h2").json()["data"][-270:]
+    data = requests.get(f"https://api.coincap.io/v2/assets/{coin_id}/history?interval=h2").json()["data"][-360:]
 
     time, price = [], []
 
