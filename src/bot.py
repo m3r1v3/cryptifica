@@ -221,9 +221,8 @@ async def favorites(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Your favorite cryptocurrencies ⭐\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour "
-             f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to "
-             f"favorite\n🗑 Remove from favorite\n🏠 Back",
+        text=f"Your favorite cryptocurrencies ⭐\n_There you can see/add/remove your favorite cryptocurrencies_\n\nYour "
+             f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
