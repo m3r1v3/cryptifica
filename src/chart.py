@@ -12,7 +12,7 @@ def get_chart(data, price) -> str:
     fig.add_hline(y=avg,
                   line_dash="dot",
                   line_color="#D0D0D9",
-    annotation_text=f"${'{:,.3f}'.format(avg)}",
+    annotation_text=f"${'{:,.f}'.format(avg)}",
                   annotation_position="bottom right",
                   annotation_font_color="#D0D0D9")
     
