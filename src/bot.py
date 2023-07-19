@@ -34,7 +34,8 @@ async def home(query):
     ]
 
     await query.answer()
-    await query.edit_message_text(
+    await query.message.delete()
+    await query.message.reply_text(
         text=f"Welcome to Cryptifica 👋🏻\n_Your personal cryptocurrency checker bot_ 🤖💰\n\nSelect option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard)
@@ -80,7 +81,8 @@ async def price_option(query):
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
          InlineKeyboardButton("▶ Next", callback_data="price_next")]]
     await query.answer()
-    await query.edit_message_text(text=f"Select cryptocurrency 💬",
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -97,7 +99,8 @@ async def price_option_next(query):
         [InlineKeyboardButton("◀ Back", callback_data="price"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
-    await query.edit_message_text(text=f"Select cryptocurrency 💬",
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -110,7 +113,8 @@ async def show_price(query):
         [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
+    await query.message.delete()
+    await query.message.reply_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
                                   f"{symbol} is  ${price} 💸\n"
                                   f"Price changed to {percent}% "
                                   f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
@@ -130,7 +134,8 @@ async def chart_option(query):
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
          InlineKeyboardButton("▶ Next", callback_data="chart_next")]]
     await query.answer()
-    await query.edit_message_text(text=f"Select cryptocurrency 💬",
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -147,7 +152,8 @@ async def chart_option_next(query):
         [InlineKeyboardButton("◀ Back", callback_data="chart"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
-    await query.edit_message_text(text=f"Select cryptocurrency 💬",
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -164,15 +170,16 @@ async def show_chart(query):
         [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    # await query.message.send_media(media=InputMediaPhoto(media=open(f"images\\{chart}.webp", "rb")))
+    await query.message.delete()
+    await query.message.reply_photo(photo=open(f"images\\{chart}.webp", "rb"),
+                                   caption=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
     delete_image(chart)
-    await query.edit_message_text(text=f"{name} ({symbol}) {'📉' if percent[0] == '-' else '📈'}",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 def create_images_folder():
-    if not os.path.exists("/images"):
-        os.makedirs("/images")
+    if not os.path.exists("images"):
+        os.makedirs("images")
 
 
 def delete_image(file_name: str):
@@ -185,7 +192,8 @@ async def alarm_option(query):
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(
+    await query.message.delete()
+    await query.message.reply_text(
         text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -195,7 +203,8 @@ async def review_option(query):
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(
+    await query.message.delete()
+    await query.message.reply_text(
         text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -207,7 +216,8 @@ async def favorites(query):
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(
+    await query.message.delete()
+    await query.message.reply_text(
         text=f"Your favorite cryptocurrencies ⭐\nThere you can see/add/remove your favorite cryptocurrencies\n\nYour "
              f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬\n\n🌟 Add to "
              f"favorite\n🗑 Remove from favorite\n🏠 Back",
@@ -220,7 +230,8 @@ async def info(query):
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
-    await query.edit_message_text(
+    await query.message.delete()
+    await query.message.reply_text(
         text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
