@@ -1,6 +1,8 @@
 numpy==1.25.1
 pandas==2.0.3
+psycopg2-binary==2.9.6
 kaleido==0.2.1
 plotly==5.15.0
 python-telegram-bot==20.3
 requests==2.31.0
+SQLAlchemy==2.0.16
