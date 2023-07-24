@@ -105,7 +105,7 @@ async def select_cryptocurrency_next(query, option):
 
 
 async def show_price(query):
-    data = get_data(query.data[6:])
+    data = get_data(query.data.split("_")[-1])
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
@@ -124,9 +124,9 @@ async def show_price(query):
 async def show_chart(query):
     create_images_folder()
 
-    data = get_data(query.data[6:])
+    data = get_data(query.data.split("_")[-1])
 
-    datas, prices = get_prices(query.data[6:])
+    datas, prices = get_prices(query.data.split("_")[-1])
 
     chart = get_chart(datas, prices)
 
@@ -168,6 +168,8 @@ async def favorites(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def favorites_add(query):
+    data = get_data(query.data.split("_")[-1])
+
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
@@ -175,12 +177,14 @@ async def favorites_add(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"... added to favorites ⭐",
+        text=f"{data['name']} added to favorites 🌟",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def favorites_remove(query):
+    data = get_data(query.data.split("_")[-1])
+
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
@@ -188,7 +192,7 @@ async def favorites_remove(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"... removed to favorites ⭐",
+        text=f"{data['name']} removed from favorites 🗑",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -211,7 +215,7 @@ async def review_option(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
+        text=f"Review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
