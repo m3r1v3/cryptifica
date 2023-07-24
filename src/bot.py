@@ -44,59 +44,59 @@ async def home(query):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "price":
-        await price_option(query)
-    elif query.data == "price_next":
-        await price_option_next(query)
+    if query.data == "price" or query.data == "chart" or query.data == "favorites_add" or query.data == "favorites_remove":
+        await select_cryptocurrency(query, query.data)
+    elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next" or query.data == "favorites_remove_next":
+        await select_cryptocurrency_next(query, query.data)
     elif query.data[:6] == "price_":
         await show_price(query)
-    elif query.data == "alarm":
-        await alarm_option(query)
-    elif query.data == "chart":
-        await chart_option(query)
-    elif query.data == "chart_next":
-        await chart_option_next(query)
     elif query.data[:6] == "chart_":
         await show_chart(query)
-    elif query.data == "review":
-        await review_option(query)
-    elif query.data == "home":
-        await home(query)
     elif query.data == "favorites":
         await favorites(query)
+    elif query.data[:14] == "favorites_add_":
+        await favorites_add(query)
+    elif query.data[:17] == "favorites_remove_":
+        await favorites_remove(query)
+    elif query.data == "review":
+        await review_option(query)
+    elif query.data == "alarm":
+        await alarm_option(query)
+    elif query.data == "home":
+        await home(query)
     elif query.data == "info":
         await info(query)
 
 
-async def price_option(query):
+async def select_cryptocurrency(query, option):
     keyboard = [
-        [InlineKeyboardButton("ETH", callback_data="price_ethereum"),
-         InlineKeyboardButton("BTC", callback_data="price_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data="price_tether"),
-         InlineKeyboardButton("USDC", callback_data="price_usd-coin")],
-        [InlineKeyboardButton("SOL", callback_data="price_solana"),
-         InlineKeyboardButton("DAI", callback_data="price_multi-collateral-dai"),
-         InlineKeyboardButton("DOGE", callback_data="price_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data="price_polygon")],
+        [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
+         InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
+         InlineKeyboardButton("USDT", callback_data=f"{option}_tether"),
+         InlineKeyboardButton("USDC", callback_data=f"{option}_usd-coin")],
+        [InlineKeyboardButton("SOL", callback_data=f"{option}_solana"),
+         InlineKeyboardButton("DAI", callback_data=f"{option}_multi-collateral-dai"),
+         InlineKeyboardButton("DOGE", callback_data=f"{option}_dogecoin"),
+         InlineKeyboardButton("MATIC", callback_data=f"{option}_polygon")],
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
-         InlineKeyboardButton("▶ Next", callback_data="price_next")]]
+         InlineKeyboardButton("▶ Next", callback_data=f"{option}_next")]]
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def price_option_next(query):
+async def select_cryptocurrency_next(query, option):
     keyboard = [
-        [InlineKeyboardButton("LTC", callback_data="price_litecoin"),
-         InlineKeyboardButton("DOT", callback_data="price_polkadot"),
-         InlineKeyboardButton("SHIB", callback_data="price_shiba-inu"),
-         InlineKeyboardButton("XMR", callback_data="price_monero")],
-        [InlineKeyboardButton("XRP", callback_data="price_xrp"),
-         InlineKeyboardButton("TRON", callback_data="price_tron"),
-         InlineKeyboardButton("BUSD", callback_data="price_binance-usd"),
-         InlineKeyboardButton("UNI", callback_data="price_uniswap")],
-        [InlineKeyboardButton("◀ Back", callback_data="price"),
+        [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
+         InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
+         InlineKeyboardButton("USDT", callback_data=f"{option}_tether"),
+         InlineKeyboardButton("USDC", callback_data=f"{option}_usd-coin")],
+        [InlineKeyboardButton("SOL", callback_data=f"{option}_solana"),
+         InlineKeyboardButton("DAI", callback_data=f"{option}_multi-collateral-dai"),
+         InlineKeyboardButton("DOGE", callback_data=f"{option}_dogecoin"),
+         InlineKeyboardButton("MATIC", callback_data=f"{option}_polygon")],
+        [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
     await query.message.delete()
@@ -118,42 +118,6 @@ async def show_price(query):
                                   f"{symbol} is  ${price} 💸\n"
                                   f"Price changed to {percent}% "
                                   f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def chart_option(query):
-    keyboard = [
-        [InlineKeyboardButton("ETH", callback_data="chart_ethereum"),
-         InlineKeyboardButton("BTC", callback_data="chart_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data="chart_tether"),
-         InlineKeyboardButton("USDC", callback_data="chart_usd-coin")],
-        [InlineKeyboardButton("SOL", callback_data="chart_solana"),
-         InlineKeyboardButton("DAI", callback_data="chart_multi-collateral-dai"),
-         InlineKeyboardButton("DOGE", callback_data="chart_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data="chart_polygon")],
-        [InlineKeyboardButton("🏠 Home", callback_data="home"),
-         InlineKeyboardButton("▶ Next", callback_data="chart_next")]]
-    await query.answer()
-    await query.message.delete()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def chart_option_next(query):
-    keyboard = [
-        [InlineKeyboardButton("LTC", callback_data="chart_litecoin"),
-         InlineKeyboardButton("DOT", callback_data="chart_polkadot"),
-         InlineKeyboardButton("SHIB", callback_data="chart_shiba-inu"),
-         InlineKeyboardButton("XMR", callback_data="chart_monero")],
-        [InlineKeyboardButton("XRP", callback_data="chart_xrp"),
-         InlineKeyboardButton("TRON", callback_data="chart_tron"),
-         InlineKeyboardButton("BUSD", callback_data="chart_binance-usd"),
-         InlineKeyboardButton("UNI", callback_data="chart_uniswap")],
-        [InlineKeyboardButton("◀ Back", callback_data="chart"),
-         InlineKeyboardButton("🏠 Home", callback_data="home")]]
-    await query.answer()
-    await query.message.delete()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -190,6 +154,45 @@ def delete_image(file_name: str):
         os.remove(f"images/{file_name}.webp")
 
 
+async def favorites(query):
+    keyboard = [
+        [InlineKeyboardButton("🌟 Add", callback_data="favorites_add"),
+         InlineKeyboardButton("🗑 Remove", callback_data="favorites_remove"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def favorites_add(query):
+    keyboard = [
+        [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"... added to favorites ⭐",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def favorites_remove(query):
+    keyboard = [
+        [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"... removed to favorites ⭐",
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
 async def alarm_option(query):
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
@@ -210,21 +213,6 @@ async def review_option(query):
     await query.message.reply_text(
         text=f"Daily review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def favorites(query):
-    keyboard = [
-        [InlineKeyboardButton("🌟 Add", callback_data="add_favorite"),
-         InlineKeyboardButton("🗑 Remove", callback_data="remove_favorite"),
-         InlineKeyboardButton("🏠 Home", callback_data="home")],
-    ]
-    await query.answer()
-    await query.message.delete()
-    await query.message.reply_text(
-        text=f"Your favorite cryptocurrencies ⭐\n_There you can see/add/remove your favorite cryptocurrencies_\n\nYour "
-             f"favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬",
-        parse_mode=ParseMode.MARKDOWN_V2,
-        reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def info(query):
