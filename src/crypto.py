@@ -12,6 +12,6 @@ def get_prices(coin_id: str):
     time, price = [], []
 
     for i in data:
-        time.append(str(datetime.datetime.fromtimestamp(i['time']//1000)))
+        time.append(str(datetime.datetime.fromtimestamp(i['time'] // 1000)))
         price.append(float(i['priceUsd']))
     return time, price

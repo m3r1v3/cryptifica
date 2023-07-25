@@ -44,9 +44,11 @@ async def home(query):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "price" or query.data == "chart" or query.data == "favorites_add" or query.data == "favorites_remove":
+    if query.data == "price" or query.data == "chart" \
+            or query.data == "favorites_add" or query.data == "favorites_remove":
         await select_cryptocurrency(query, query.data)
-    elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next" or query.data == "favorites_remove_next":
+    elif query.data == "price_next" or query.data == "chart_next" \
+            or query.data == "favorites_add_next" or query.data == "favorites_remove_next":
         await select_cryptocurrency_next(query, query.data)
     elif query.data[:6] == "price_":
         await show_price(query)
@@ -83,7 +85,7 @@ async def select_cryptocurrency(query, option):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def select_cryptocurrency_next(query, option):
@@ -101,7 +103,7 @@ async def select_cryptocurrency_next(query, option):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def show_price(query):
@@ -115,10 +117,10 @@ async def show_price(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
-                                  f"{symbol} is  ${price} 💸\n"
-                                  f"Price changed to {percent}% "
-                                  f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
-                                  reply_markup=InlineKeyboardMarkup(keyboard))
+                                        f"{symbol} is  ${price} 💸\n"
+                                        f"Price changed to {percent}% "
+                                        f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def show_chart(query):
@@ -131,7 +133,6 @@ async def show_chart(query):
     chart = get_chart(datas, prices)
 
     name, symbol = data['name'], data['symbol']
-    percent = '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
@@ -166,6 +167,7 @@ async def favorites(query):
         text=f"Favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
+
 
 async def favorites_add(query):
     data = get_data(query.data.split("_")[-1])
