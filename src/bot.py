@@ -6,6 +6,7 @@ from telegram.constants import ParseMode
 
 from crypto import get_data, get_prices
 from chart import get_chart
+from database import Favorites
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -161,10 +162,11 @@ async def favorites(query):
          InlineKeyboardButton("🗑 Remove", callback_data="favorites_remove"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Favorites ⭐\n\n_You haven't added your favorite cryptocurrencies yet_\n\nSelect option 💬",
+        text=f"Select option 💬",
         parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -172,16 +174,26 @@ async def favorites(query):
 async def favorites_add(query):
     data = get_data(query.data.split("_")[-1])
 
+    favorites = Favorites.get(query.from_user.id).split(",")
+
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
     await query.answer()
     await query.message.delete()
-    await query.message.reply_text(
-        text=f"{data['name']} added to favorites 🌟",
-        parse_mode=ParseMode.MARKDOWN_V2,
-        reply_markup=InlineKeyboardMarkup(keyboard))
+
+    if query.data.split("_")[-1] not in favorites:
+        Favorites.add(query.from_user.id, query.data.split("_")[-1])
+        await query.message.reply_text(
+            text=f"{data['name']} added to favorites 🌟",
+            parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=InlineKeyboardMarkup(keyboard))
+    else:
+        await query.message.reply_text(
+            text=f"{data['name']} already in favorites ⭐",
+            parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def favorites_remove(query):
