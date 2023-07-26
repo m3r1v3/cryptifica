@@ -1,29 +1,33 @@
 import os
 import random
 
-from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session
+from sqlalchemy.orm import mapped_column
 
 engine = create_engine(os.environ.get('DATABASE_URL'))
-Base = declarative_base()
+session = Session(engine)
 
-Session = sessionmaker(bind=engine)
-session = Session()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class Favorites(Base):
     __tablename__ = "favorites"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, unique=True, nullable=False)
-    favorites = Column(String, unique=False, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(nullable=False)
+    favorites: Mapped[str]
 
     @staticmethod
-    def add(user_id: str, favorites: str):
-        session.add(Favorites(id=random.randint(1, 2147483647), user_id=user_id, favorites=favorites))
-        session.commit()
+    def add_favorite(self, user_id, favorites):
+        pass
+
+    @staticmethod
+    def remove_favorite(self):
+        pass
 
     def __repr__(self):
-        return "<Favorites(id='%s', user_id='%s', favorites='%s')>" % (self.id, self.role, self.server)
+        return "<Favorites(id='%s', user_id='%s', favorites='%s')>" % (self.id, self.user_id, self.favorites)
