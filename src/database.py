@@ -1,11 +1,11 @@
+import os
+
 from sqlalchemy import create_engine
-from sqlalchemy.sql.expression import exists
 
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session
 from sqlalchemy.orm import mapped_column
 
-engine = create_engine(
-    "postgresql://postgres:MDCW5YRm76OIMdtk9kEC@containers-us-west-195.railway.app:5767/railway")  # create_engine(os.environ.get('DATABASE_URL'))
+engine = create_engine(os.environ.get('DATABASE_URL'))
 
 
 class Base(DeclarativeBase):
@@ -37,7 +37,7 @@ class Favorites(Base):
         with Session(engine) as session:
             session.begin()
             try:
-                if session.query(exists().where(Favorites.user_id == user_id)).scalar():
+                if session.query(Favorites.id).filter(Favorites.user_id == user_id).count():
                     session.query(Favorites).filter(Favorites.user_id == user_id).update({
                         'favorites': f'{session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites}{favorite},'})
                 else:
@@ -52,7 +52,7 @@ class Favorites(Base):
         with Session(engine) as session:
             session.begin()
             try:
-                if session.query(exists().where(Favorites.user_id == user_id)).scalar():
+                if session.query(Favorites.id).filter(Favorites.user_id == user_id).count():
                     session.query(Favorites).filter(Favorites.user_id == user_id).update({
                         'favorites': f'{session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites.replace(f"{favorite},", "")}'})
             except:
