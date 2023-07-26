@@ -19,7 +19,7 @@ def get_chart(data, price) -> str:
 
     fig.update_xaxes(showgrid=False, visible=True, showticklabels=True, gridcolor="#D2D3D9")
     fig.update_yaxes(showgrid=True, visible=True, showticklabels=True, gridcolor="#D2D3D9")
-    fig.update_layout(font_family="assets/Ruberoid-Medium.ttf",
+    fig.update_layout(font_family="Ruberoid Medium",
                       yaxis_title=None,
                       xaxis_title=None,
                       plot_bgcolor='#181526',
