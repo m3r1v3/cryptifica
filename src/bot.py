@@ -91,16 +91,16 @@ async def select_cryptocurrency(query, option):
 
 async def select_cryptocurrency_next(query, option):
     keyboard = [
-        [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
-         InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data=f"{option}_tether"),
-         InlineKeyboardButton("USDC", callback_data=f"{option}_usd-coin")],
-        [InlineKeyboardButton("SOL", callback_data=f"{option}_solana"),
-         InlineKeyboardButton("DAI", callback_data=f"{option}_multi-collateral-dai"),
-         InlineKeyboardButton("DOGE", callback_data=f"{option}_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data=f"{option}_polygon")],
-        [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
-         InlineKeyboardButton("🏠 Home", callback_data="home")]]
+            [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
+             InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
+             InlineKeyboardButton("SHIB", callback_data=f"{option}_shiba-inu"),
+             InlineKeyboardButton("XMR", callback_data=f"{option}_monero")],
+            [InlineKeyboardButton("XRP", callback_data=f"{option}_xrp"),
+             InlineKeyboardButton("TRON", callback_data=f"{option}_tron"),
+             InlineKeyboardButton("BUSD", callback_data=f"{option}_binance-usd"),
+             InlineKeyboardButton("UNI", callback_data=f"{option}_uniswap")],
+            [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
+             InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
