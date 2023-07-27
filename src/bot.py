@@ -1,6 +1,6 @@
 import os
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
@@ -45,11 +45,9 @@ async def home(query):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "price" or query.data == "chart" \
-            or query.data == "favorites_add" or query.data == "favorites_remove":
+    if query.data == "price" or query.data == "chart" or query.data == "favorites_add":
         await select_cryptocurrency(query, query.data)
-    elif query.data == "price_next" or query.data == "chart_next" \
-            or query.data == "favorites_add_next" or query.data == "favorites_remove_next":
+    elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next":
         await select_cryptocurrency_next(query, query.data)
     elif query.data[:6] == "price_":
         await show_price(query)
@@ -59,6 +57,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await favorites(query)
     elif query.data[:14] == "favorites_add_":
         await favorites_add(query)
+    elif query.data == "favorites_remove":
+        await select_favorites_remove(query)
+    elif query.data == "favorites_remove_next":
+        await select_favorites_remove_next(query)
     elif query.data[:17] == "favorites_remove_":
         await favorites_remove(query)
     elif query.data == "review":
@@ -195,9 +197,55 @@ async def favorites_add(query):
             parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=InlineKeyboardMarkup(keyboard))
 
+def get_favorites_keyboard(favorites):
+    keyboard = []
+    keyboard_layer = []
+
+    data = get_data()
+
+    for i in range(0, len(favorites[:8])):
+        keyboard_layer.append(InlineKeyboardButton(str([d['symbol'] for d in data if d['id'] == favorites[i]][0]), callback_data=f"favorites_remove_{favorites[i]}"))
+        if (i+1) == 4:
+            keyboard.append(keyboard_layer)
+            keyboard_layer = []
+    keyboard.append(keyboard_layer)
+
+    return keyboard
+
+
+async def select_favorites_remove(query):
+    favorites = Favorites.get(query.from_user.id).split(",")[:-1]
+
+    keyboard = get_favorites_keyboard(favorites)[:8]
+
+    if len(favorites) >= 9:
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"),
+                         InlineKeyboardButton("▶ Next", callback_data=f"favorites_remove_next")])
+    else: keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def select_favorites_remove_next(query):
+    favorites = Favorites.get(query.from_user.id).split(",")[:-1]
+
+    keyboard = get_favorites_keyboard(favorites[8:])
+    keyboard.append([InlineKeyboardButton("◀ Back", callback_data=f"favorites_remove"),
+                     InlineKeyboardButton("🏠 Home", callback_data="home")])
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(text=f"Select cryptocurrency 💬",
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
+
 
 async def favorites_remove(query):
     data = get_data(query.data.split("_")[-1])
+
+    Favorites.remove(query.from_user.id, query.data.split("_")[-1])
 
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
