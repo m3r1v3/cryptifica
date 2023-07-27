@@ -13,14 +13,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
-         InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+        [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+         InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
     await update.message.reply_text(
-        text=f"Welcome to Cryptifica 👋🏻\n_Your personal cryptocurrency checker bot_ 🤖💰\n\nSelect option 💬",
-        parse_mode=ParseMode.MARKDOWN_V2,
+        text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+        parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -29,16 +29,16 @@ async def home(query):
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
-         InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+        [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+         InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Welcome to Cryptifica 👋🏻\n_Your personal cryptocurrency checker bot_ 🤖💰\n\nSelect option 💬",
-        parse_mode=ParseMode.MARKDOWN_V2,
+        text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+        parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -169,7 +169,6 @@ async def favorites(query):
     await query.message.delete()
     await query.message.reply_text(
         text=f"Select option 💬",
-        parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -189,12 +188,10 @@ async def favorites_add(query):
         Favorites.add(query.from_user.id, query.data.split("_")[-1])
         await query.message.reply_text(
             text=f"{data['name']} added to favorites 🌟",
-            parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=InlineKeyboardMarkup(keyboard))
     else:
         await query.message.reply_text(
             text=f"{data['name']} already in favorites ⭐",
-            parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=InlineKeyboardMarkup(keyboard))
 
 def get_favorites_keyboard(favorites):
@@ -204,7 +201,7 @@ def get_favorites_keyboard(favorites):
     data = get_data()
 
     for i in range(0, len(favorites[:8])):
-        keyboard_layer.append(InlineKeyboardButton(str([d['symbol'] for d in data if d['id'] == favorites[i]][0]), callback_data=f"favorites_remove_{favorites[i]}"))
+        keyboard_layer.append(InlineKeyboardButton(get_favorite_data(data, favorites[i])['symbol'], callback_data=f"favorites_remove_{favorites[i]}"))
         if (i+1) == 4:
             keyboard.append(keyboard_layer)
             keyboard_layer = []
@@ -255,8 +252,38 @@ async def favorites_remove(query):
     await query.message.delete()
     await query.message.reply_text(
         text=f"{data['name']} removed from favorites 🗑",
-        parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def review_option(query):
+    keyboard = [
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+
+    favorites = Favorites.get(query.from_user.id).split(",")[:-1]
+
+    if favorites:
+        review = get_favorite_review(get_data(), favorites)
+    else: review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>",
+        parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+def get_favorite_review(data, favorites):
+    reviews = []
+    for favorite in favorites:
+        d = get_favorite_data(data, favorite)
+        reviews.append(f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) {'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
+    return "\n".join(reviews)
+
+
+def get_favorite_data(data, favorite):
+    for d in data:
+        if d['id'] == favorite: return d
 
 
 async def alarm_option(query):
@@ -267,17 +294,6 @@ async def alarm_option(query):
     await query.message.delete()
     await query.message.reply_text(
         text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
-        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
-
-
-async def review_option(query):
-    keyboard = [
-        [InlineKeyboardButton("🏠 Home", callback_data="home")],
-    ]
-    await query.answer()
-    await query.message.delete()
-    await query.message.reply_text(
-        text=f"Review 📝\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
