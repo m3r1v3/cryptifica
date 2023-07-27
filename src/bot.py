@@ -58,9 +58,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data[:14] == "favorites_add_":
         await favorites_add(query)
     elif query.data == "favorites_remove":
-        await select_favorites_remove(query.split('_')[0])
+        await select_favorites_remove(query.data.split('_')[0])
     elif query.data == "favorites_remove_next":
-        await select_favorites_remove_next(query.split('_')[0])
+        await select_favorites_remove_next(query.data.split('_')[0])
     elif query.data[:17] == "favorites_remove_":
         await favorites_remove(query)
     elif query.data == "review":
@@ -93,16 +93,16 @@ async def select_cryptocurrency(query, option):
 
 async def select_cryptocurrency_next(query, option):
     keyboard = [
-            [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
-             InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
-             InlineKeyboardButton("SHIB", callback_data=f"{option}_shiba-inu"),
-             InlineKeyboardButton("XMR", callback_data=f"{option}_monero")],
-            [InlineKeyboardButton("XRP", callback_data=f"{option}_xrp"),
-             InlineKeyboardButton("TRON", callback_data=f"{option}_tron"),
-             InlineKeyboardButton("BUSD", callback_data=f"{option}_binance-usd"),
-             InlineKeyboardButton("UNI", callback_data=f"{option}_uniswap")],
-            [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
-             InlineKeyboardButton("🏠 Home", callback_data="home")]]
+        [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
+         InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
+         InlineKeyboardButton("SHIB", callback_data=f"{option}_shiba-inu"),
+         InlineKeyboardButton("XMR", callback_data=f"{option}_monero")],
+        [InlineKeyboardButton("XRP", callback_data=f"{option}_xrp"),
+         InlineKeyboardButton("TRON", callback_data=f"{option}_tron"),
+         InlineKeyboardButton("BUSD", callback_data=f"{option}_binance-usd"),
+         InlineKeyboardButton("UNI", callback_data=f"{option}_uniswap")],
+        [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]]
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
@@ -194,6 +194,7 @@ async def favorites_add(query):
             text=f"{data['name']} already in favorites ⭐",
             reply_markup=InlineKeyboardMarkup(keyboard))
 
+
 def get_favorites_keyboard(favorites):
     keyboard = []
     keyboard_layer = []
@@ -201,8 +202,9 @@ def get_favorites_keyboard(favorites):
     data = get_data()
 
     for i in range(0, len(favorites[:8])):
-        keyboard_layer.append(InlineKeyboardButton(get_favorite_data(data, favorites[i])['symbol'], callback_data=f"favorites_remove_{favorites[i]}"))
-        if (i+1) == 4:
+        keyboard_layer.append(InlineKeyboardButton(get_favorite_data(data, favorites[i])['symbol'],
+                                                   callback_data=f"favorites_remove_{favorites[i]}"))
+        if (i + 1) == 4:
             keyboard.append(keyboard_layer)
             keyboard_layer = []
     keyboard.append(keyboard_layer)
@@ -218,7 +220,8 @@ async def select_favorites_remove(query):
     if len(favorites) >= 9:
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"),
                          InlineKeyboardButton("▶ Next", callback_data=f"favorites_remove_next")])
-    else: keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
+    else:
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
 
     await query.answer()
     await query.message.delete()
@@ -264,7 +267,8 @@ async def review_option(query):
 
     if favorites:
         review = get_favorite_review(get_data(), favorites)
-    else: review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
+    else:
+        review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
     await query.answer()
     await query.message.delete()
@@ -277,7 +281,8 @@ def get_favorite_review(data, favorites):
     reviews = []
     for favorite in favorites:
         d = get_favorite_data(data, favorite)
-        reviews.append(f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) {'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
+        reviews.append(
+            f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) {'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
     return "\n".join(reviews)
 
 

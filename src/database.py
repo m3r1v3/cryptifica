@@ -30,7 +30,6 @@ class Favorites(Base):
                 return session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites
             except:
                 session.rollback()
-                raise
 
     @staticmethod
     def add(user_id: int, favorite: str):
