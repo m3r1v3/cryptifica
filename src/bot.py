@@ -58,9 +58,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data[:14] == "favorites_add_":
         await favorites_add(query)
     elif query.data == "favorites_remove":
-        await select_favorites_remove(query.data.split('_')[0])
+        await select_favorites_remove(query)
     elif query.data == "favorites_remove_next":
-        await select_favorites_remove_next(query.data.split('_')[0])
+        await select_favorites_remove_next(query)
     elif query.data[:17] == "favorites_remove_":
         await favorites_remove(query)
     elif query.data == "review":
