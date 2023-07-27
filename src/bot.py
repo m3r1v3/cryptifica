@@ -46,9 +46,9 @@ async def home(query):
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.data == "price" or query.data == "chart" or query.data == "favorites_add":
-        await select_cryptocurrency(query, query.data)
+        await select_cryptocurrency(query, query.data.split('_')[0])
     elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next":
-        await select_cryptocurrency_next(query, query.data)
+        await select_cryptocurrency_next(query, query.data.split('_')[0])
     elif query.data[:6] == "price_":
         await show_price(query)
     elif query.data[:6] == "chart_":
@@ -58,9 +58,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data[:14] == "favorites_add_":
         await favorites_add(query)
     elif query.data == "favorites_remove":
-        await select_favorites_remove(query)
+        await select_favorites_remove(query.split('_')[0])
     elif query.data == "favorites_remove_next":
-        await select_favorites_remove_next(query)
+        await select_favorites_remove_next(query.split('_')[0])
     elif query.data[:17] == "favorites_remove_":
         await favorites_remove(query)
     elif query.data == "review":
