@@ -363,7 +363,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    await enable_alarm(update, context)
+    # await enable_alarm(update, context)
 
     await query.answer()
     await query.message.delete()
@@ -385,7 +385,7 @@ async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    await disable_alarm(update, context)
+    # await disable_alarm(update, context)
 
     await query.answer()
     await query.message.delete()
