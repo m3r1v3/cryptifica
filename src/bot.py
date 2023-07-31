@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -46,9 +47,9 @@ async def home(query):
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.data == "price" or query.data == "chart" or query.data == "favorites_add":
-        await select_cryptocurrency(query, query.data.split('_')[0])
+        await select_cryptocurrency(query)
     elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next":
-        await select_cryptocurrency_next(query, query.data.split('_')[0])
+        await select_cryptocurrency_next(query)
     elif query.data[:6] == "price_":
         await price(query)
     elif query.data[:6] == "chart_":
@@ -79,7 +80,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await info(query)
 
 
-async def select_cryptocurrency(query, option):
+async def select_cryptocurrency(query):
+    option = query.data.split('_')[0]
     keyboard = [
         [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
          InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
@@ -98,6 +100,7 @@ async def select_cryptocurrency(query, option):
 
 
 async def select_cryptocurrency_next(query, option):
+    option = query.data.split('_')[0]
     keyboard = [
         [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
          InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
@@ -126,7 +129,7 @@ async def price(query):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
-                                        f"{symbol} is  ${price} 💸\n"
+                                        f"{symbol} is ${price} 💸\n"
                                         f"Price changed to {percent}% "
                                         f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
@@ -299,8 +302,8 @@ def get_favorite_data(data, favorite):
 
 async def alarm(query):
     keyboard = [
-        [InlineKeyboardButton("⏰ On", callback_data="alarm_time"),
-         InlineKeyboardButton("⛔ Off", callback_data="alarm_off"),
+        [InlineKeyboardButton("▶ On", callback_data="alarm_on"),
+         InlineKeyboardButton("⏹ Off", callback_data="alarm_off"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
@@ -316,7 +319,7 @@ async def alarm_time(query):
         [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
          InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
          InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
-         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")]
+         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")],
         [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
@@ -326,6 +329,44 @@ async def alarm_time(query):
     await query.message.reply_text(
         text=f"Select time ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def alarm_on(query):
+    keyboard = [
+        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]
+    ]
+
+    enable_alarm(query)
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Alarm is enabled ⏰▶",
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+def enable_alarm(query, hour):
+    query.job_queue.run_daily(review, time=datetime.time(hour=int(query.data.split('_')[-1]), minute=0), days=(0, 1, 2, 3, 4, 5, 6), query=query.message.chat_id)
+
+
+async def alarm_off(query):
+    keyboard = [
+        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]
+    ]
+
+    disable_alarm(query)
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Alarm is disabled ⏰⏹",
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+def disable_alarm(query):
+    query.job_queue.get_jobs_by_name(str(query.message.chat_id))[0].schedule_removal()
 
 
 async def info(query):
