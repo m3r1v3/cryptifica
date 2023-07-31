@@ -50,9 +50,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next":
         await select_cryptocurrency_next(query, query.data.split('_')[0])
     elif query.data[:6] == "price_":
-        await show_price(query)
+        await price(query)
     elif query.data[:6] == "chart_":
-        await show_chart(query)
+        await chart(query)
     elif query.data == "favorites":
         await favorites(query)
     elif query.data[:14] == "favorites_add_":
@@ -64,9 +64,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data[:17] == "favorites_remove_":
         await favorites_remove(query)
     elif query.data == "review":
-        await review_option(query)
+        await review(query)
     elif query.data == "alarm":
-        await alarm_option(query)
+        await alarm(query)
+    elif query.data == "alarm_on":
+        await alarm_time(query)
+    elif query.data[:9] == "alarm_on_":
+        await alarm_on(query)
+    elif query.data == "alarm_off":
+        await alarm_off(query)
     elif query.data == "home":
         await home(query)
     elif query.data == "info":
@@ -109,7 +115,7 @@ async def select_cryptocurrency_next(query, option):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def show_price(query):
+async def price(query):
     data = get_data(query.data.split("_")[-1])
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
@@ -126,7 +132,7 @@ async def show_price(query):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def show_chart(query):
+async def chart(query):
     create_images_folder()
 
     data = get_data(query.data.split("_")[-1])
@@ -258,7 +264,7 @@ async def favorites_remove(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def review_option(query):
+async def review(query):
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
@@ -291,15 +297,52 @@ def get_favorite_data(data, favorite):
         if d['id'] == favorite: return d
 
 
-async def alarm_option(query):
+async def alarm(query):
     keyboard = [
-        [InlineKeyboardButton("🏠 Home", callback_data="home")],
+        [InlineKeyboardButton("⏰ On", callback_data="alarm_time"),
+         InlineKeyboardButton("⛔ Off", callback_data="alarm_off"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Notify 🔔\n\n_This feature is currently under development, please check back soon_ 🐘",
-        parse_mode=ParseMode.MARKDOWN_V2, reply_markup=InlineKeyboardMarkup(keyboard))
+        text=f"Select option 💬",
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def alarm_time(query):
+    keyboard = [
+        [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
+         InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
+         InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
+         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")]
+        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]
+    ]
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Select time ⏰",
+        reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def alarm_time(query):
+    keyboard = [
+        [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
+         InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
+         InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
+         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")]
+        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]
+    ]
+
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(
+        text=f"Select time ⏰",
+        reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def info(query):
