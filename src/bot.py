@@ -26,7 +26,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def home(query):
+async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
@@ -46,41 +48,42 @@ async def home(query):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data == "price" or query.data == "chart" or query.data == "favorites_add":
-        await select_cryptocurrency(query)
-    elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites_add_next":
-        await select_cryptocurrency_next(query)
+    if query.data == "price" or query.data == "chart" or query.data == "favorites-add":
+        await select_cryptocurrency(update, context)
+    elif query.data == "price_next" or query.data == "chart_next" or query.data == "favorites-add_next":
+        await select_cryptocurrency_next(update, context)
     elif query.data[:6] == "price_":
-        await price(query)
+        await price(update, context)
     elif query.data[:6] == "chart_":
-        await chart(query)
+        await chart(update, context)
     elif query.data == "favorites":
-        await favorites(query)
-    elif query.data[:14] == "favorites_add_":
-        await favorites_add(query)
-    elif query.data == "favorites_remove":
-        await select_favorites_remove(query)
-    elif query.data == "favorites_remove_next":
-        await select_favorites_remove_next(query)
-    elif query.data[:17] == "favorites_remove_":
-        await favorites_remove(query)
+        await favorites(update, context)
+    elif query.data[:14] == "favorites-add_":
+        await favorites_add(update, context)
+    elif query.data == "favorites-remove":
+        await select_favorites_remove(update, context)
+    elif query.data == "favorites-remove_next":
+        await select_favorites_remove_next(update, context)
+    elif query.data[:17] == "favorites-remove_":
+        await favorites_remove(update, context)
     elif query.data == "review":
-        await review(query)
+        await review(update, context)
     elif query.data == "alarm":
-        await alarm(query)
+        await alarm(update, context)
     elif query.data == "alarm_on":
-        await alarm_time(query)
+        await alarm_time(update, context)
     elif query.data[:9] == "alarm_on_":
-        await alarm_on(query)
+        await alarm_on(update, context)
     elif query.data == "alarm_off":
-        await alarm_off(query)
+        await alarm_off(update, context)
     elif query.data == "home":
-        await home(query)
+        await home(update, context)
     elif query.data == "info":
-        await info(query)
+        await info(update, context)
 
 
-async def select_cryptocurrency(query):
+async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
     option = query.data.split('_')[0]
     keyboard = [
         [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
@@ -99,7 +102,8 @@ async def select_cryptocurrency(query):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def select_cryptocurrency_next(query, option):
+async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
     option = query.data.split('_')[0]
     keyboard = [
         [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
@@ -118,7 +122,9 @@ async def select_cryptocurrency_next(query, option):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def price(query):
+async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     data = get_data(query.data.split("_")[-1])
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
@@ -135,7 +141,9 @@ async def price(query):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def chart(query):
+async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     create_images_folder()
 
     data = get_data(query.data.split("_")[-1])
@@ -167,10 +175,12 @@ def delete_image(file_name: str):
         os.remove(f"images/{file_name}.webp")
 
 
-async def favorites(query):
+async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
-        [InlineKeyboardButton("🌟 Add", callback_data="favorites_add"),
-         InlineKeyboardButton("🗑 Remove", callback_data="favorites_remove"),
+        [InlineKeyboardButton("🌟 Add", callback_data="favorites-add"),
+         InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
@@ -181,7 +191,9 @@ async def favorites(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def favorites_add(query):
+async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     data = get_data(query.data.split("_")[-1])
 
     favorites = Favorites.get(query.from_user.id).split(",")
@@ -212,7 +224,7 @@ def get_favorites_keyboard(favorites):
 
     for i in range(0, len(favorites[:8])):
         keyboard_layer.append(InlineKeyboardButton(get_favorite_data(data, favorites[i])['symbol'],
-                                                   callback_data=f"favorites_remove_{favorites[i]}"))
+                                                   callback_data=f"favorites-remove_{favorites[i]}"))
         if (i + 1) == 4:
             keyboard.append(keyboard_layer)
             keyboard_layer = []
@@ -221,14 +233,16 @@ def get_favorites_keyboard(favorites):
     return keyboard
 
 
-async def select_favorites_remove(query):
+async def select_favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
 
     keyboard = get_favorites_keyboard(favorites)[:8]
 
     if len(favorites) >= 9:
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"),
-                         InlineKeyboardButton("▶ Next", callback_data=f"favorites_remove_next")])
+                         InlineKeyboardButton("▶ Next", callback_data=f"favorites-remove_next")])
     else:
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
 
@@ -238,11 +252,13 @@ async def select_favorites_remove(query):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def select_favorites_remove_next(query):
+async def select_favorites_remove_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
 
     keyboard = get_favorites_keyboard(favorites[8:])
-    keyboard.append([InlineKeyboardButton("◀ Back", callback_data=f"favorites_remove"),
+    keyboard.append([InlineKeyboardButton("◀ Back", callback_data=f"favorites-remove"),
                      InlineKeyboardButton("🏠 Home", callback_data="home")])
 
     await query.answer()
@@ -251,7 +267,9 @@ async def select_favorites_remove_next(query):
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def favorites_remove(query):
+async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     data = get_data(query.data.split("_")[-1])
 
     Favorites.remove(query.from_user.id, query.data.split("_")[-1])
@@ -267,7 +285,9 @@ async def favorites_remove(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def review(query):
+async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
@@ -300,7 +320,9 @@ def get_favorite_data(data, favorite):
         if d['id'] == favorite: return d
 
 
-async def alarm(query):
+async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("▶ On", callback_data="alarm_on"),
          InlineKeyboardButton("⏹ Off", callback_data="alarm_off"),
@@ -314,7 +336,9 @@ async def alarm(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def alarm_time(query):
+async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
          InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
@@ -331,13 +355,15 @@ async def alarm_time(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def alarm_on(query):
+async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+        [InlineKeyboardButton("◀ Back", callback_data="alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    enable_alarm(query)
+    await enable_alarm(update, context)
 
     await query.answer()
     await query.message.delete()
@@ -346,17 +372,20 @@ async def alarm_on(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-def enable_alarm(query, hour):
-    query.job_queue.run_daily(review, time=datetime.time(hour=int(query.data.split('_')[-1]), minute=0), days=(0, 1, 2, 3, 4, 5, 6), query=query.message.chat_id)
+async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1]), minute=0), days=(0, 1, 2, 3, 4, 5, 6), chat_id=update.message.chat_id)
 
 
-async def alarm_off(query):
+async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
+        [InlineKeyboardButton("◀ Back", callback_data="alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    disable_alarm(query)
+    await disable_alarm(update, context)
 
     await query.answer()
     await query.message.delete()
@@ -365,11 +394,17 @@ async def alarm_off(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-def disable_alarm(query):
-    query.job_queue.get_jobs_by_name(str(query.message.chat_id))[0].schedule_removal()
+async def disable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.job.get_jobs_by_name(str(update.message.chat_id))[0].schedule_removal()
 
 
-async def info(query):
+async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=context.job.chat_id, text=f'BEEP {context.job.data}!')
+
+
+async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
