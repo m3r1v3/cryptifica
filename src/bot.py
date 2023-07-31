@@ -328,23 +328,6 @@ async def alarm_time(query):
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def alarm_time(query):
-    keyboard = [
-        [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
-         InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
-         InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
-         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")]
-        [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
-         InlineKeyboardButton("🏠 Home", callback_data="home")]
-    ]
-
-    await query.answer()
-    await query.message.delete()
-    await query.message.reply_text(
-        text=f"Select time ⏰",
-        reply_markup=InlineKeyboardMarkup(keyboard))
-
-
 async def info(query):
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
