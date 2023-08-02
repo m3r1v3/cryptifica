@@ -38,7 +38,6 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
         parse_mode=ParseMode.HTML,
@@ -85,6 +84,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     option = query.data.split('_')[0]
+
     keyboard = [
         [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
          InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
@@ -96,8 +96,8 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
          InlineKeyboardButton("MATIC", callback_data=f"{option}_polygon")],
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
          InlineKeyboardButton("▶ Next", callback_data=f"{option}_next")]]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -105,6 +105,7 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
 async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     option = query.data.split('_')[0]
+
     keyboard = [
         [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
          InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
@@ -116,8 +117,8 @@ async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAU
          InlineKeyboardButton("UNI", callback_data=f"{option}_uniswap")],
         [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -132,8 +133,8 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
                                         f"{symbol} is ${price} 💸\n"
                                         f"Price changed to {percent}% "
@@ -157,8 +158,8 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_photo(photo=open(f"images/{chart}.webp", "rb"),
                                     caption=f"{name} ({symbol}) {'📉' if prices[0] > prices[-1] else '📈'}",
                                     reply_markup=InlineKeyboardMarkup(keyboard))
@@ -185,7 +186,6 @@ async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Select option 💬",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -202,9 +202,8 @@ async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
-    await query.answer()
-    await query.message.delete()
 
+    await query.answer()
     if query.data.split("_")[-1] not in favorites:
         Favorites.add(query.from_user.id, query.data.split("_")[-1])
         await query.message.reply_text(
@@ -247,7 +246,6 @@ async def select_favorites_remove(update: Update, context: ContextTypes.DEFAULT_
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -262,7 +260,6 @@ async def select_favorites_remove_next(update: Update, context: ContextTypes.DEF
                      InlineKeyboardButton("🏠 Home", callback_data="home")])
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text=f"Select cryptocurrency 💬",
                                    reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -278,8 +275,8 @@ async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("◀ Back", callback_data=f"favorites"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"{data['name']} removed from favorites 🗑",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -300,7 +297,6 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
         review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>",
         parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
@@ -330,7 +326,6 @@ async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Select option 💬",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -349,7 +344,6 @@ async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Select time ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -366,7 +360,6 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # await enable_alarm(update, context)
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Alarm is enabled ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -388,7 +381,6 @@ async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # await disable_alarm(update, context)
 
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"Alarm is disabled ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
@@ -408,8 +400,8 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
+
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(
         text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
         parse_mode=ParseMode.MARKDOWN_V2,
