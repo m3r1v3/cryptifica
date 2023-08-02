@@ -335,10 +335,10 @@ async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     keyboard = [
-        [InlineKeyboardButton("🕛 00:00 UTC", callback_data="alarm_on_0"),
-         InlineKeyboardButton("🕗 8:00 UTC", callback_data="alarm_on_8"),
-         InlineKeyboardButton("🕛 12:00 UTC", callback_data="alarm_on_12"),
-         InlineKeyboardButton("🕗 20:00 UTC", callback_data="alarm_on_20")],
+        [InlineKeyboardButton("🕛 0:00", callback_data="alarm_on_0"),
+         InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
+         InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
+         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")],
         [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
@@ -361,13 +361,13 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.answer()
     await query.message.reply_text(
-        text=f"Alarm is enabled ⏰",
+        text=f"Alarm is enabled on {query.data.split('_')[-1]}:00 ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1])), days=(0, 1, 2, 3, 4, 5, 6), chat_id=query.message.chat_id, data=str(query.from_user.id))
+    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1])), days=(0, 1, 2, 3, 4, 5, 6), name=str(query.message.chat_id), chat_id=query.message.chat_id, data=str(query.from_user.id))
 
 
 async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
