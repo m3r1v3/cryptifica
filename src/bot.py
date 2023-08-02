@@ -368,7 +368,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Alarm is enabled ⏰▶",
+        text=f"Alarm is enabled ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -390,7 +390,7 @@ async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.message.delete()
     await query.message.reply_text(
-        text=f"Alarm is disabled ⏰⏹",
+        text=f"Alarm is disabled ⏰",
         reply_markup=InlineKeyboardMarkup(keyboard))
 
 
