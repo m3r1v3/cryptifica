@@ -10,6 +10,34 @@ from chart import get_chart
 from database import Favorites
 
 
+async def send_message(update: Update, text: str, keyboard: list):
+    await update.message.reply_text(text=text,
+                                    parse_mode=ParseMode.HTML,
+                                    reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def send_alarm_message(context: ContextTypes.DEFAULT_TYPE, text: str, keyboard: list):
+    await context.bot.reply_text(text=text,
+                                    parse_mode=ParseMode.HTML,
+                                    reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def reply_message(query, text: str, keyboard: list):
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_text(text,
+                                   parse_mode=ParseMode.HTML,
+                                   reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+async def reply_photo(query, path: str, caption: str, keyboard: list):
+    await query.answer()
+    await query.message.delete()
+    await query.message.reply_photo(photo=open(path, "rb"),
+                                    caption=caption,
+                                    reply_markup=InlineKeyboardMarkup(keyboard))
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
@@ -19,16 +47,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
-    await update.message.reply_text(
-        text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
-        parse_mode=ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    await send_message(update=update,
+                       text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+                       keyboard=keyboard)
 
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
@@ -37,12 +61,9 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("ℹ Info", callback_data="info")],
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
-        parse_mode=ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    await reply_message(query=update.callback_query,
+                       text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+                       keyboard=keyboard)
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -97,9 +118,9 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
         [InlineKeyboardButton("🏠 Home", callback_data="home"),
          InlineKeyboardButton("▶ Next", callback_data=f"{option}_next")]]
 
-    await query.answer()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query,
+                        text=f"Select cryptocurrency 💬",
+                        keyboard=keyboard)
 
 
 async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -118,9 +139,9 @@ async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAU
         [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
-    await query.answer()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query,
+                        text=f"Select cryptocurrency 💬",
+                        keyboard=keyboard)
 
 
 async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -130,16 +151,14 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
-    keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")],
-    ]
+    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
-    await query.answer()
-    await query.message.reply_text(text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
+    await reply_message(query=query,
+                        text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
                                         f"{symbol} is ${price} 💸\n"
                                         f"Price changed to {percent}% "
                                         f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+                        keyboard=keyboard)
 
 
 async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -148,7 +167,6 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     create_images_folder()
 
     data = get_data(query.data.split("_")[-1])
-
     datas, prices = get_prices(query.data.split("_")[-1])
 
     chart = get_chart(datas, prices)
@@ -159,10 +177,9 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await query.answer()
-    await query.message.reply_photo(photo=open(f"images/{chart}.webp", "rb"),
-                                    caption=f"{name} ({symbol}) {'📉' if prices[0] > prices[-1] else '📈'}",
-                                    reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_photo(query=query, path=f"images/{chart}.webp",
+                      caption=f"{name} ({symbol}) {'📉' if prices[0] > prices[-1] else '📈'}",
+                      keyboard=keyboard)
     delete_image(chart)
 
 
@@ -177,25 +194,19 @@ def delete_image(file_name: str):
 
 
 async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("🌟 Add", callback_data="favorites-add"),
          InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Select option 💬",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=update.callback_query, text=f"Select option 💬", keyboard=keyboard)
 
 
 async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     data = get_data(query.data.split("_")[-1])
-
     favorites = Favorites.get(query.from_user.id).split(",")
 
     keyboard = [
@@ -206,13 +217,9 @@ async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     if query.data.split("_")[-1] not in favorites:
         Favorites.add(query.from_user.id, query.data.split("_")[-1])
-        await query.message.reply_text(
-            text=f"{data['name']} added to favorites 🌟",
-            reply_markup=InlineKeyboardMarkup(keyboard))
+        await reply_message(query=query, text=f"{data['name']} added to favorites 🌟", keyboard=keyboard)
     else:
-        await query.message.reply_text(
-            text=f"{data['name']} already in favorites ⭐",
-            reply_markup=InlineKeyboardMarkup(keyboard))
+        await reply_message(query=query, text=f"{data['name']} already in favorites ⭐", keyboard=keyboard)
 
 
 def get_favorites_keyboard(favorites):
@@ -245,9 +252,7 @@ async def select_favorites_remove(update: Update, context: ContextTypes.DEFAULT_
     else:
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
 
-    await query.answer()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query, text=f"Select cryptocurrency 💬", keyboard=keyboard)
 
 
 async def select_favorites_remove_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -259,9 +264,7 @@ async def select_favorites_remove_next(update: Update, context: ContextTypes.DEF
     keyboard.append([InlineKeyboardButton("◀ Back", callback_data=f"favorites-remove"),
                      InlineKeyboardButton("🏠 Home", callback_data="home")])
 
-    await query.answer()
-    await query.message.reply_text(text=f"Select cryptocurrency 💬",
-                                   reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query, text=f"Select cryptocurrency 💬", keyboard=keyboard)
 
 
 async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -276,10 +279,7 @@ async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"{data['name']} removed from favorites 🗑",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query, text=f"{data['name']} removed from favorites 🗑", keyboard=keyboard)
 
 
 async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -290,16 +290,9 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
+    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
-    if favorites:
-        review = get_favorite_review(get_data(), favorites)
-    else:
-        review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
-
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>",
-        parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=query, text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
 
 def get_favorite_review(data, favorites):
@@ -317,23 +310,16 @@ def get_favorite_data(data, favorite):
 
 
 async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("▶ On", callback_data="alarm_on"),
          InlineKeyboardButton("⏹ Off", callback_data="alarm_off"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Select option 💬",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=update.callback_query, text=f"Select option 💬", keyboard=keyboard)
 
 
 async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("🕛 0:00", callback_data="alarm_on_0"),
          InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
@@ -343,10 +329,7 @@ async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Select time ⏰",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=update.callback_query, text=f"Select time ⏰", keyboard=keyboard)
 
 
 async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -358,11 +341,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await enable_alarm(update, context)
-
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Alarm is enabled on {query.data.split('_')[-1]}:00 ⏰",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=update.callback_query, text=f"Alarm is enabled on {query.data.split('_')[-1]}:00 ⏰", keyboard=keyboard)
 
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -371,19 +350,13 @@ async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("◀ Back", callback_data="alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    # await disable_alarm(update, context)
-
-    await query.answer()
-    await query.message.reply_text(
-        text=f"Alarm is disabled ⏰",
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await disable_alarm(update, context)
+    await reply_message(query=update.callback_query, text=f"Alarm is disabled ⏰", keyboard=keyboard)
 
 
 async def disable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -396,30 +369,17 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(int(context.job.data)).split(",")[:-1]
+    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
-    if favorites:
-        review = get_favorite_review(get_data(), favorites)
-    else:
-        review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
-
-    await context.bot.send_message(
-        chat_id=context.job.chat_id,
-        text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>",
-        parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
+    await send_alarm_message(context=context, text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await query.answer()
-    await query.message.reply_text(
-        text=f"About Cryptifica ℹ\n\n_This feature is currently under development, please check back soon_ 🐘",
-        parse_mode=ParseMode.MARKDOWN_V2,
-        reply_markup=InlineKeyboardMarkup(keyboard))
+    await reply_message(query=update.callback_query, text=f"About Cryptifica ℹ\n\n<i>This feature is currently under development, please check back soon</i> 🐘", keyboard=keyboard)
 
 
 if __name__ == "__main__":
