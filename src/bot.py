@@ -335,10 +335,10 @@ async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     keyboard = [
-        [InlineKeyboardButton("🕛 00:00", callback_data="alarm_on_0"),
-         InlineKeyboardButton("🕗 8:00", callback_data="alarm_on_8"),
-         InlineKeyboardButton("🕛 12:00", callback_data="alarm_on_12"),
-         InlineKeyboardButton("🕗 20:00", callback_data="alarm_on_20")],
+        [InlineKeyboardButton("🕛 00:00 UTC", callback_data="alarm_on_0"),
+         InlineKeyboardButton("🕗 8:00 UTC", callback_data="alarm_on_8"),
+         InlineKeyboardButton("🕛 12:00 UTC", callback_data="alarm_on_12"),
+         InlineKeyboardButton("🕗 20:00 UTC", callback_data="alarm_on_20")],
         [InlineKeyboardButton("◀ Back", callback_data=f"alarm"),
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
@@ -357,7 +357,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
-    # await enable_alarm(update, context)
+    await enable_alarm(update, context)
 
     await query.answer()
     await query.message.reply_text(
@@ -367,7 +367,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1]), minute=0), days=(0, 1, 2, 3, 4, 5, 6), chat_id=update.message.chat_id)
+    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1])), days=(0, 1, 2, 3, 4, 5, 6), chat_id=query.message.chat_id, data=str(query.from_user.id))
 
 
 async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -387,11 +387,25 @@ async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def disable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.job.get_jobs_by_name(str(update.message.chat_id))[0].schedule_removal()
+    context.job_queue.get_jobs_by_name(str(update.callback_query.message.chat_id))[0].schedule_removal()
 
 
 async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=context.job.chat_id, text=f'BEEP {context.job.data}!')
+    keyboard = [
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+
+    favorites = Favorites.get(int(context.job.data)).split(",")[:-1]
+
+    if favorites:
+        review = get_favorite_review(get_data(), favorites)
+    else:
+        review = "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
+
+    await context.bot.send_message(
+        chat_id=context.job.chat_id,
+        text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>",
+        parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
