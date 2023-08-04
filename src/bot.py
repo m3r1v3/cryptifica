@@ -49,7 +49,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ]
 
     await send_message(update=update,
-                       text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+                       text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
                        keyboard=keyboard)
 
 
@@ -64,7 +64,7 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await reply_message(query=update.callback_query,
-                       text=f"Welcome to Cryptifica 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+                        text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
                        keyboard=keyboard)
 
 
@@ -374,11 +374,21 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
     keyboard = [
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await reply_message(query=update.callback_query, text=f"About Cryptifica ℹ\n\n<i>This feature is currently under development, please check back soon</i> 🐘", keyboard=keyboard)
+    await reply_message(query=query, text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your personal cryptocurrency checker bot, made with ❤ by @m3r1v3 🤖💰</i>\n\n"
+                        f"What can I do?\n\n"
+                        f"<i> 💰 Show the current cryptocurrency prices\n"
+                        f" 📈 Show cryptocurrency price chart for the last 30 days\n"
+                        f" 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to favorites\n"
+                        f" 🔔 Make review for you in specified time\n"
+                        f"...and other features that we will make in the future ✨</i>\n\n"
+                        f"Check prices, make charts with me. With <b>Cryptifica</b> 🤖",
+                        keyboard=keyboard)
 
 
 if __name__ == "__main__":
