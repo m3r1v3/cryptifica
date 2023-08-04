@@ -35,6 +35,7 @@ async def reply_photo(query, path: str, caption: str, keyboard: list):
     await query.message.delete()
     await query.message.reply_photo(photo=open(path, "rb"),
                                     caption=caption,
+                                    parse_mode=ParseMode.HTML,
                                     reply_markup=InlineKeyboardMarkup(keyboard))
 
 
@@ -54,7 +55,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
+        [InlineKeyboardButton("💰 Price", callback_data="price"),
+         InlineKeyboardButton("📈 Chart", callback_data="chart"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
         [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
          InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
@@ -154,10 +156,7 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_message(query=query,
-                        text=f"{name} ({symbol}) 💰\n\nAt the current time, the price of "
-                                        f"{symbol} is ${price} 💸\n"
-                                        f"Price changed to {percent}% "
-                                        f"in 24 hours {'📉' if percent[0] == '-' else '📈'}",
+                        text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on <b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
                         keyboard=keyboard)
 
 
@@ -178,7 +177,7 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await reply_photo(query=query, path=f"images/{chart}.webp",
-                      caption=f"{name} ({symbol}) {'📉' if prices[0] > prices[-1] else '📈'}",
+                      caption=f"<b>{name} ({symbol})</b> {'📉' if prices[0] > prices[-1] else '📈'}",
                       keyboard=keyboard)
     delete_image(chart)
 
@@ -217,9 +216,9 @@ async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     if query.data.split("_")[-1] not in favorites:
         Favorites.add(query.from_user.id, query.data.split("_")[-1])
-        await reply_message(query=query, text=f"{data['name']} added to favorites 🌟", keyboard=keyboard)
+        await reply_message(query=query, text=f"<b>{data['name']}</b> added to favorites 🌟", keyboard=keyboard)
     else:
-        await reply_message(query=query, text=f"{data['name']} already in favorites ⭐", keyboard=keyboard)
+        await reply_message(query=query, text=f"<b>{data['name']}</b> already in favorites ⭐", keyboard=keyboard)
 
 
 def get_favorites_keyboard(favorites):
@@ -279,7 +278,7 @@ async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await reply_message(query=query, text=f"{data['name']} removed from favorites 🗑", keyboard=keyboard)
+    await reply_message(query=query, text=f"<b>{data['name']}</b> removed from favorites 🗑", keyboard=keyboard)
 
 
 async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -292,7 +291,7 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
     review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
-    await reply_message(query=query, text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
+    await reply_message(query=query, text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
 
 def get_favorite_review(data, favorites):
@@ -341,7 +340,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await enable_alarm(update, context)
-    await reply_message(query=update.callback_query, text=f"Alarm is enabled on {query.data.split('_')[-1]}:00 ⏰", keyboard=keyboard)
+    await reply_message(query=update.callback_query, text=f"Alarm is enabled on <i>{query.data.split('_')[-1]}:00</i> (UTC) ⏰", keyboard=keyboard)
 
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -371,7 +370,7 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
     favorites = Favorites.get(int(context.job.data)).split(",")[:-1]
     review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
 
-    await send_alarm_message(context=context, text=f"Review 📝\n<i>Prices of your favorite cryptocurrency on the current time 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
+    await send_alarm_message(context=context, text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
