@@ -380,7 +380,7 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await reply_message(query=query, text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your personal cryptocurrency checker bot, made with ❤ by @m3r1v3 🤖💰</i>\n\n"
+    await reply_message(query=query, text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your personal cryptocurrency checker bot, made with ❤ on 🐍 by @m3r1v3 🤖💰</i>\n\n"
                         f"What can I do?\n\n"
                         f"<i> 💰 Show the current cryptocurrency prices\n"
                         f" 📈 Show cryptocurrency price chart for the last 30 days\n"
