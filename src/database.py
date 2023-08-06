@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session
 from sqlalchemy.orm import mapped_column
 
-engine = create_engine(os.environ.get('DATABASE_URL'))
+engine = create_engine("sqlite:///data.db")
 
 
 class Base(DeclarativeBase):
@@ -28,7 +28,7 @@ class Favorites(Base):
                     session.add(Favorites(user_id=user_id, favorites=""))
                     session.commit()
                 return session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites
-            except:
+            except Exception:
                 session.rollback()
 
     @staticmethod
@@ -41,7 +41,7 @@ class Favorites(Base):
                         'favorites': f'{session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites}{favorite},'})
                 else:
                     session.add(Favorites(user_id=user_id, favorites=f"{favorite},"))
-            except:
+            except Exception:
                 session.rollback()
             else:
                 session.commit()
@@ -54,7 +54,7 @@ class Favorites(Base):
                 if session.query(Favorites.id).filter(Favorites.user_id == user_id).count():
                     session.query(Favorites).filter(Favorites.user_id == user_id).update({
                         'favorites': f'{session.query(Favorites).filter(Favorites.user_id == user_id).first().favorites.replace(f"{favorite},", "")}'})
-            except:
+            except Exception:
                 session.rollback()
             else:
                 session.commit()
