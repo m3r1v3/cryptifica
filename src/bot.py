@@ -41,7 +41,8 @@ async def reply_photo(query, path: str, caption: str, keyboard: list):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("💰 Price", callback_data="price"), InlineKeyboardButton("📈 Chart", callback_data="chart"),
+        [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
+         InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
         [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
          InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
@@ -55,8 +56,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("💰 Price", callback_data="price"),
-         InlineKeyboardButton("📈 Chart", callback_data="chart"),
+        [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
+         InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
          InlineKeyboardButton("📝 Review", callback_data="review")],
         [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
          InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
@@ -70,10 +71,9 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.data in ["price", "chart", "favorites-add"]:
+    print(query.data)
+    if query.data.split("#")[0] in ["price", "chart", "favorites-add"]:
         await select_cryptocurrency(update, context)
-    elif query.data in ["price_next", "chart_next", "favorites-add_next"]:
-        await select_cryptocurrency_next(update, context)
     elif query.data[:6] == "price_":
         await price(update, context)
     elif query.data[:6] == "chart_":
@@ -106,40 +106,35 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    option = query.data.split('_')[0]
+    
+    option = query.data.split('#')[0]
+    start, end = query.data.split('#')[-1].split("-")
+    data = get_data()
 
-    keyboard = [
-        [InlineKeyboardButton("ETH", callback_data=f"{option}_ethereum"),
-         InlineKeyboardButton("BTC", callback_data=f"{option}_bitcoin"),
-         InlineKeyboardButton("USDT", callback_data=f"{option}_tether"),
-         InlineKeyboardButton("USDC", callback_data=f"{option}_usd-coin")],
-        [InlineKeyboardButton("SOL", callback_data=f"{option}_solana"),
-         InlineKeyboardButton("DAI", callback_data=f"{option}_multi-collateral-dai"),
-         InlineKeyboardButton("DOGE", callback_data=f"{option}_dogecoin"),
-         InlineKeyboardButton("MATIC", callback_data=f"{option}_polygon")],
-        [InlineKeyboardButton("🏠 Home", callback_data="home"),
-         InlineKeyboardButton("▶ Next", callback_data=f"{option}_next")]]
+    keyboard = get_keyboard([cryptocurrency['id'] for cryptocurrency in data[int(start):int(end)]], option)
 
-    await reply_message(
-        query=query, text="Select cryptocurrency 💬", keyboard=keyboard
-    )
+    
+    if len(data) <= int(end) and int(start) == 0:
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
+    elif len(data) <= int(end) and int(start) != 0:
+        keyboard.append(
+            [
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("🏠 Home", callback_data="home")
+            ]
+        )
+    elif int(start) > 0:
+        keyboard.append(
+            [
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}"),
+            ]
+        )
+    else:
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}")])
 
-
-async def select_cryptocurrency_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    option = query.data.split('_')[0]
-
-    keyboard = [
-        [InlineKeyboardButton("LTC", callback_data=f"{option}_litecoin"),
-         InlineKeyboardButton("DOT", callback_data=f"{option}_polkadot"),
-         InlineKeyboardButton("SHIB", callback_data=f"{option}_shiba-inu"),
-         InlineKeyboardButton("XMR", callback_data=f"{option}_monero")],
-        [InlineKeyboardButton("XRP", callback_data=f"{option}_xrp"),
-         InlineKeyboardButton("TRON", callback_data=f"{option}_tron"),
-         InlineKeyboardButton("BUSD", callback_data=f"{option}_binance-usd"),
-         InlineKeyboardButton("UNI", callback_data=f"{option}_uniswap")],
-        [InlineKeyboardButton("◀ Back", callback_data=f"{option}"),
-         InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_message(
         query=query, text="Select cryptocurrency 💬", keyboard=keyboard
@@ -153,7 +148,7 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
-    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price"), InlineKeyboardButton("🏠 Home", callback_data="home")]]
+    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price#0-9"), InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_message(query=query,
                         text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on <b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
@@ -173,7 +168,7 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
 
     keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data="chart"), InlineKeyboardButton("🏠 Home", callback_data="home")],
+        [InlineKeyboardButton("◀ Back", callback_data="chart#0-9"), InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
     await reply_photo(query=query, path=f"images/{chart}.webp",
@@ -194,7 +189,7 @@ def delete_image(file_name: str):
 
 async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🌟 Add", callback_data="favorites-add"),
+        [InlineKeyboardButton("🌟 Add", callback_data="favorites-add#0-9"),
          InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
@@ -225,15 +220,15 @@ async def favorites_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await reply_message(query=query, text=f"<b>{data['name']}</b> already in favorites ⭐", keyboard=keyboard)
 
 
-def get_favorites_keyboard(favorites):
+def get_keyboard(cryptocurrencies, option):
     keyboard = []
     keyboard_layer = []
 
     data = get_data()
 
-    for i in range(len(favorites[:8]))
-        keyboard_layer.append(InlineKeyboardButton(get_favorite_data(data, favorites[i])['symbol'],
-                                                   callback_data=f"favorites-remove_{favorites[i]}"))
+    for i in range(len(cryptocurrencies[:8])):
+        keyboard_layer.append(InlineKeyboardButton(get_cryptocurrency_data(data, cryptocurrencies[i])['symbol'],
+                                                   callback_data=f"{option}_{cryptocurrencies[i]}"))
         if i == 3:
             keyboard.append(keyboard_layer)
             keyboard_layer = []
@@ -247,7 +242,7 @@ async def select_favorites_remove(update: Update, context: ContextTypes.DEFAULT_
 
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
 
-    keyboard = get_favorites_keyboard(favorites)[:8]
+    keyboard = get_keyboard(favorites, "favorites-remove")[:8]
 
     if len(favorites) >= 9:
         keyboard.append(
@@ -309,7 +304,7 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
-    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
+    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Add to favorites to receive your personalized review 🧾"
 
     await reply_message(query=query, text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
@@ -317,15 +312,15 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def get_favorite_review(data, favorites):
     reviews = []
     for favorite in favorites:
-        d = get_favorite_data(data, favorite)
+        d = get_cryptocurrency_data(data, favorite)
         reviews.append(
             f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) {'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
     return "\n".join(reviews)
 
 
-def get_favorite_data(data, favorite):
+def get_cryptocurrency_data(data, cryptocurrency):
     for d in data:
-        if d['id'] == favorite: return d
+        if d['id'] == cryptocurrency: return d
 
 
 async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -400,7 +395,7 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(int(context.job.data)).split(",")[:-1]
-    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Submit to receive your personalized review 🧾"
+    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Add to favorites to receive your personalized review 🧾"
 
     await send_alarm_message(context=context, text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
 
