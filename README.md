@@ -7,7 +7,8 @@
         What can I do?<br>
         - 💰 Show the current cryptocurrency prices<br>
         - 📈 Show cryptocurrency price chart for the last 30 days<br>
-        - 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to favorites<br>
+        - 📝 Make review for your favorite cryptocurrencies<br>
+        - ⭐ Save your cryptocurrencies to favorites<br>
         - 🔔 Make review for you in specified time<br>
         ...and other features that we will make in the future ✨</i><br><br>
         Check prices, make charts with me. With Cryptifica 🤖
