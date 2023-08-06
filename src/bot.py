@@ -114,9 +114,9 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
     keyboard = get_keyboard([cryptocurrency['id'] for cryptocurrency in data[int(start):int(end)]], option)
 
     
-    if len(data) <= int(end) and int(start) == 0:
+    if len(data) <= int(end) and not int(start):
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
-    elif len(data) <= int(end) and int(start) != 0:
+    elif len(data) <= int(end):
         keyboard.append(
             [
                 InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),

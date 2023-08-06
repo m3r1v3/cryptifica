@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session
 from sqlalchemy.orm import mapped_column
 
-engine = create_engine("sqlite:///data.db")
+engine = create_engine(os.environ.get('DATABASE_URL'))
 
 
 class Base(DeclarativeBase):
