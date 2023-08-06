@@ -71,9 +71,10 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    print(query.data)
     if query.data.split("#")[0] in ["price", "chart", "favorites-add"]:
         await select_cryptocurrency(update, context)
+    elif query.data.split("_")[-1] == "search":
+        pass
     elif query.data[:6] == "price_":
         await price(update, context)
     elif query.data[:6] == "chart_":
@@ -115,12 +116,13 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
 
     
     if len(data) <= int(end) and not int(start):
-        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"), InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search")])
     elif len(data) <= int(end):
         keyboard.append(
             [
                 InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
-                InlineKeyboardButton("🏠 Home", callback_data="home")
+                InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search")
             ]
         )
     elif int(start) > 0:
@@ -128,11 +130,14 @@ async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TY
             [
                 InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
                 InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search"),
                 InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}"),
             ]
         )
     else:
-        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"),
+        keyboard.append([
+                InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search"),
                 InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}")])
 
 
@@ -266,7 +271,7 @@ async def select_favorites_remove_next(update: Update, context: ContextTypes.DEF
 
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
 
-    keyboard = get_favorites_keyboard(favorites[8:])
+    keyboard = get_keyboard(favorites[8:], "favorites-remove")
     keyboard.append(
         [
             InlineKeyboardButton("◀ Back", callback_data="favorites-remove"),
