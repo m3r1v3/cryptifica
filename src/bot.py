@@ -10,6 +10,17 @@ from chart import get_chart
 from database import Favorites
 
 
+MENU_KEYBOARD = [
+    [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
+     InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
+     InlineKeyboardButton("📝 Review", callback_data="review"),
+     InlineKeyboardButton("🔔 Notify", callback_data="alarm")],
+    [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
+     InlineKeyboardButton("🔍 Search", callback_data="search"),
+     InlineKeyboardButton("ℹ Info", callback_data="info")]
+]
+
+
 async def send_message(update: Update, text: str, keyboard: list):
     await update.message.reply_text(text=text,
                                     parse_mode=ParseMode.HTML,
@@ -74,33 +85,15 @@ async def reply_select_cryptocurrency(query, data: list):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [
-        [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
-         InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
-         InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
-         InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
-         InlineKeyboardButton("ℹ Info", callback_data="info")],
-    ]
-
     await send_message(update=update,
                        text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
-                       keyboard=keyboard)
+                       keyboard=MENU_KEYBOARD)
 
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
-         InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
-         InlineKeyboardButton("📝 Review", callback_data="review")],
-        [InlineKeyboardButton("⭐ Favorites", callback_data="favorites"),
-         InlineKeyboardButton("🔔 Notify", callback_data="alarm"),
-         InlineKeyboardButton("ℹ Info", callback_data="info")],
-    ]
-
     await reply_message(query=update.callback_query,
-                        text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
-                       keyboard=keyboard)
+                        text=f"Select option 💬",
+                        keyboard=MENU_KEYBOARD)
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -133,6 +126,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await alarm_off(update, context)
     elif query.data == "home":
         await home(update, context)
+    elif query.data == "search":
+        pass
     elif query.data == "info":
         await info(update, context)
 
