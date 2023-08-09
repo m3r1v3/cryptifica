@@ -2,7 +2,7 @@ import os
 import datetime
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ConversationHandler, ContextTypes
 from telegram.constants import ParseMode
 
 from crypto import get_data, get_prices
@@ -37,6 +37,40 @@ async def reply_photo(query, path: str, caption: str, keyboard: list):
                                     caption=caption,
                                     parse_mode=ParseMode.HTML,
                                     reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def reply_select_cryptocurrency(query, data: list):
+    option = query.data.split('#')[0]
+    start, end = query.data.split('#')[-1].split("-")
+
+    keyboard = get_keyboard(data[int(start):int(end)], option)
+
+
+    if len(data) <= int(end) and not int(start):
+        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
+    elif len(data) <= int(end):
+        keyboard.append(
+            [
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("🏠 Home", callback_data="home"),
+            ]
+        )
+    elif int(start) > 0:
+        keyboard.append(
+            [
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("🏠 Home", callback_data="home"),
+                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}"),
+            ]
+        )
+    else:
+        keyboard.append([
+            InlineKeyboardButton("🏠 Home", callback_data="home"),
+            InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}")])
+
+
+    await reply_message(
+        query=query, text="Select cryptocurrency 💬", keyboard=keyboard
+    )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -83,10 +117,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await favorites(update, context)
     elif query.data[:14] == "favorites-add_":
         await favorites_add(update, context)
-    elif query.data == "favorites-remove":
+    elif query.data.split("#")[0] == "favorites-remove":
         await select_favorites_remove(update, context)
-    elif query.data == "favorites-remove_next":
-        await select_favorites_remove_next(update, context)
     elif query.data[:17] == "favorites-remove_":
         await favorites_remove(update, context)
     elif query.data == "review":
@@ -106,44 +138,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def select_cryptocurrency(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    
-    option = query.data.split('#')[0]
-    start, end = query.data.split('#')[-1].split("-")
-    data = get_data()
-
-    keyboard = get_keyboard([cryptocurrency['id'] for cryptocurrency in data[int(start):int(end)]], option)
-
-    
-    if len(data) <= int(end) and not int(start):
-        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home"), InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search")])
-    elif len(data) <= int(end):
-        keyboard.append(
-            [
-                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
-                InlineKeyboardButton("🏠 Home", callback_data="home"),
-                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search")
-            ]
-        )
-    elif int(start) > 0:
-        keyboard.append(
-            [
-                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
-                InlineKeyboardButton("🏠 Home", callback_data="home"),
-                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search"),
-                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}"),
-            ]
-        )
-    else:
-        keyboard.append([
-                InlineKeyboardButton("🏠 Home", callback_data="home"),
-                InlineKeyboardButton("🔍 Search", callback_data=f"{option}_search"),
-                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}")])
-
-
-    await reply_message(
-        query=query, text="Select cryptocurrency 💬", keyboard=keyboard
-    )
+    await reply_select_cryptocurrency(update.callback_query, [cryptocurrency['id'] for cryptocurrency in get_data()])
 
 
 async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -195,7 +190,7 @@ def delete_image(file_name: str):
 async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🌟 Add", callback_data="favorites-add#0-9"),
-         InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove"),
+         InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove#0-9"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
@@ -244,44 +239,7 @@ def get_keyboard(cryptocurrencies, option):
 
 async def select_favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
-    favorites = Favorites.get(query.from_user.id).split(",")[:-1]
-
-    keyboard = get_keyboard(favorites, "favorites-remove")[:8]
-
-    if len(favorites) >= 9:
-        keyboard.append(
-            [
-                InlineKeyboardButton("🏠 Home", callback_data="home"),
-                InlineKeyboardButton(
-                    "▶ Next", callback_data="favorites-remove_next"
-                ),
-            ]
-        )
-    else:
-        keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
-
-    await reply_message(
-        query=query, text="Select cryptocurrency 💬", keyboard=keyboard
-    )
-
-
-async def select_favorites_remove_next(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-
-    favorites = Favorites.get(query.from_user.id).split(",")[:-1]
-
-    keyboard = get_keyboard(favorites[8:], "favorites-remove")
-    keyboard.append(
-        [
-            InlineKeyboardButton("◀ Back", callback_data="favorites-remove"),
-            InlineKeyboardButton("🏠 Home", callback_data="home"),
-        ]
-    )
-
-    await reply_message(
-        query=query, text="Select cryptocurrency 💬", keyboard=keyboard
-    )
+    await reply_select_cryptocurrency(query, Favorites.get(query.from_user.id).split(",")[:-1])
 
 
 async def favorites_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
