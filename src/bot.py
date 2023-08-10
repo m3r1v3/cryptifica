@@ -9,7 +9,6 @@ from crypto import get_data, get_prices
 from chart import get_chart
 from database import Favorites
 
-
 MENU_KEYBOARD = [
     [InlineKeyboardButton("💰 Price", callback_data="price#0-9"),
      InlineKeyboardButton("📈 Chart", callback_data="chart#0-9"),
@@ -29,8 +28,8 @@ async def send_message(update: Update, text: str, keyboard: list):
 
 async def send_alarm_message(context: ContextTypes.DEFAULT_TYPE, text: str, keyboard: list):
     await context.bot.reply_text(text=text,
-                                    parse_mode=ParseMode.HTML,
-                                    reply_markup=InlineKeyboardMarkup(keyboard))
+                                 parse_mode=ParseMode.HTML,
+                                 reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def reply_message(query, text: str, keyboard: list):
@@ -49,35 +48,34 @@ async def reply_photo(query, path: str, caption: str, keyboard: list):
                                     parse_mode=ParseMode.HTML,
                                     reply_markup=InlineKeyboardMarkup(keyboard))
 
+
 async def reply_select_cryptocurrency(query, data: list):
     option = query.data.split('#')[0]
     start, end = query.data.split('#')[-1].split("-")
 
     keyboard = get_keyboard(data[int(start):int(end)], option)
 
-
     if len(data) <= int(end) and not int(start):
         keyboard.append([InlineKeyboardButton("🏠 Home", callback_data="home")])
     elif len(data) <= int(end):
         keyboard.append(
             [
-                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start) - 9}-{int(start)}"),
                 InlineKeyboardButton("🏠 Home", callback_data="home"),
             ]
         )
     elif int(start) > 0:
         keyboard.append(
             [
-                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start)-9}-{int(start)}"),
+                InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start) - 9}-{int(start)}"),
                 InlineKeyboardButton("🏠 Home", callback_data="home"),
-                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}"),
+                InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end) + 8}"),
             ]
         )
     else:
         keyboard.append([
             InlineKeyboardButton("🏠 Home", callback_data="home"),
-            InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end)+8}")])
-
+            InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end) + 8}")])
 
     await reply_message(
         query=query, text="Select cryptocurrency 💬", keyboard=keyboard
@@ -86,14 +84,17 @@ async def reply_select_cryptocurrency(query, data: list):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await send_message(update=update,
-                       text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> 🤖💰\n\nSelect option 💬",
+                       text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> "
+                            f"🤖💰\n\nSelect option 💬",
                        keyboard=MENU_KEYBOARD)
 
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await reply_message(query=update.callback_query,
-                        text=f"Select option 💬",
-                        keyboard=MENU_KEYBOARD)
+    await reply_message(
+        query=update.callback_query,
+        text="Select option 💬",
+        keyboard=MENU_KEYBOARD,
+    )
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -143,10 +144,12 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
-    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price#0-9"), InlineKeyboardButton("🏠 Home", callback_data="home")]]
+    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price#0-9"),
+                 InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_message(query=query,
-                        text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on <b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
+                        text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on "
+                             f"<b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
                         keyboard=keyboard)
 
 
@@ -163,7 +166,8 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
 
     keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data="chart#0-9"), InlineKeyboardButton("🏠 Home", callback_data="home")],
+        [InlineKeyboardButton("◀ Back", callback_data="chart#0-9"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
     await reply_photo(query=query, path=f"images/{chart}.webp",
@@ -262,9 +266,14 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(query.from_user.id).split(",")[:-1]
-    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Add to favorites to receive your personalized review 🧾"
+    review = get_favorite_review(get_data(),
+                                 favorites) if favorites else ("You don't have any favorite cryptocurrencies yet. Add "
+                                                               "to favorites to receive your personalized review 🧾")
 
-    await reply_message(query=query, text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
+    await reply_message(query=query,
+                        text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n"
+                             f"<i>{review}</i>",
+                        keyboard=keyboard)
 
 
 def get_favorite_review(data, favorites):
@@ -272,13 +281,15 @@ def get_favorite_review(data, favorites):
     for favorite in favorites:
         d = get_cryptocurrency_data(data, favorite)
         reviews.append(
-            f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) {'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
+            f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) "
+            f"{'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
     return "\n".join(reviews)
 
 
 def get_cryptocurrency_data(data, cryptocurrency):
     for d in data:
-        if d['id'] == cryptocurrency: return d
+        if d['id'] == cryptocurrency:
+            return d
 
 
 async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -321,12 +332,15 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await enable_alarm(update, context)
-    await reply_message(query=update.callback_query, text=f"Alarm is enabled on <i>{query.data.split('_')[-1]}:00</i> (UTC) ⏰", keyboard=keyboard)
+    await reply_message(query=update.callback_query,
+                        text=f"Alarm is enabled on <i>{query.data.split('_')[-1]}:00</i> (UTC) ⏰", keyboard=keyboard)
 
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1])), days=(0, 1, 2, 3, 4, 5, 6), name=str(query.message.chat_id), chat_id=query.message.chat_id, data=str(query.from_user.id))
+    context.job_queue.run_daily(alarmed_review, time=datetime.time(hour=int(query.data.split('_')[-1])),
+                                days=(0, 1, 2, 3, 4, 5, 6), name=str(query.message.chat_id),
+                                chat_id=query.message.chat_id, data=str(query.from_user.id))
 
 
 async def alarm_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -353,9 +367,14 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
     ]
 
     favorites = Favorites.get(int(context.job.data)).split(",")[:-1]
-    review = get_favorite_review(get_data(), favorites) if favorites else "You don't have any favorite cryptocurrencies yet. Add to favorites to receive your personalized review 🧾"
+    review = get_favorite_review(get_data(),
+                                 favorites) if favorites else ("You don't have any favorite cryptocurrencies yet. Add "
+                                                               "to favorites to receive your personalized review 🧾")
 
-    await send_alarm_message(context=context, text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n<i>{review}</i>", keyboard=keyboard)
+    await send_alarm_message(context=context,
+                             text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour "
+                                  f"💸</i>\n\n<i>{review}</i>",
+                             keyboard=keyboard)
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -365,14 +384,17 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
-    await reply_message(query=query, text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your personal cryptocurrency checker bot, made with ❤ on 🐍 by @m3r1v3 🤖💰</i>\n\n"
-                        f"What can I do?\n\n"
-                        f"<i> 💰 Show the current cryptocurrency prices\n"
-                        f" 📈 Show cryptocurrency price chart for the last 30 days\n"
-                        f" 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to favorites\n"
-                        f" 🔔 Make review for you in specified time\n"
-                        f"...and other features that we will make in the future ✨</i>\n\n"
-                        f"Check prices, make charts with me. With <b>Cryptifica</b> 🤖",
+    await reply_message(query=query,
+                        text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your "
+                             f"personal cryptocurrency checker bot, made with ❤ on 🐍 by @m3r1v3 🤖💰</i>\n\n"
+                             f"What can I do?\n\n"
+                             f"<i> 💰 Show the current cryptocurrency prices\n"
+                             f" 📈 Show cryptocurrency price chart for the last 30 days\n"
+                             f" 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to "
+                             f"favorites\n"
+                             f" 🔔 Make review for you in specified time\n"
+                             f"...and other features that we will make in the future ✨</i>\n\n"
+                             f"Check prices, make charts with me. With <b>Cryptifica</b> 🤖",
                         keyboard=keyboard)
 
 
