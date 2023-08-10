@@ -2,7 +2,7 @@ import os
 import datetime
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ConversationHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 from telegram.constants import ParseMode
 
 from crypto import get_data, get_prices
@@ -34,7 +34,6 @@ async def send_alarm_message(context: ContextTypes.DEFAULT_TYPE, text: str, keyb
 
 async def reply_message(query, text: str, keyboard: list):
     await query.answer()
-    await query.message.delete()
     await query.message.reply_text(text,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=InlineKeyboardMarkup(keyboard))
@@ -42,7 +41,6 @@ async def reply_message(query, text: str, keyboard: list):
 
 async def reply_photo(query, path: str, caption: str, keyboard: list):
     await query.answer()
-    await query.message.delete()
     await query.message.reply_photo(photo=open(path, "rb"),
                                     caption=caption,
                                     parse_mode=ParseMode.HTML,
@@ -101,8 +99,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.data.split("#")[0] in ["price", "chart", "favorites-add"]:
         await select_cryptocurrency(update, context)
-    elif query.data.split("_")[-1] == "search":
-        pass
     elif query.data[:6] == "price_":
         await price(update, context)
     elif query.data[:6] == "chart_":
@@ -128,7 +124,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == "home":
         await home(update, context)
     elif query.data == "search":
-        pass
+        await search_ask(update, context)
     elif query.data == "info":
         await info(update, context)
 
@@ -226,7 +222,7 @@ def get_keyboard(cryptocurrencies, option):
     data = get_data()
 
     for i in range(len(cryptocurrencies[:8])):
-        keyboard_layer.append(InlineKeyboardButton(get_cryptocurrency_data(data, cryptocurrencies[i])['symbol'],
+        keyboard_layer.append(InlineKeyboardButton(get_cryptocurrency_data_by_id(data, cryptocurrencies[i])['symbol'],
                                                    callback_data=f"{option}_{cryptocurrencies[i]}"))
         if i == 3:
             keyboard.append(keyboard_layer)
@@ -279,16 +275,22 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def get_favorite_review(data, favorites):
     reviews = []
     for favorite in favorites:
-        d = get_cryptocurrency_data(data, favorite)
+        d = get_cryptocurrency_data_by_id(data, favorite)
         reviews.append(
             f" • {d['name']} ({d['symbol']}) — ${d['priceUsd']} ({'{0:.{1}f}'.format(float(d['changePercent24Hr']), 4)}%) "
             f"{'📉' if d['changePercent24Hr'][0] == '-' else '📈'}")
     return "\n".join(reviews)
 
 
-def get_cryptocurrency_data(data, cryptocurrency):
+def get_cryptocurrency_data_by_id(data, cryptocurrency):
     for d in data:
         if d['id'] == cryptocurrency:
+            return d
+
+
+def get_cryptocurrency_data_by_symbol(data, symbol):
+    for d in data:
+        if d['symbol'] == symbol:
             return d
 
 
@@ -398,10 +400,49 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         keyboard=keyboard)
 
 
+async def search_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("🏠 Home", callback_data="home")],
+    ]
+
+    await reply_message(query=update.callback_query,
+                        text="Send symbol of cryptocurrency (like $BTC or $ETH) to do someting with it 🔍",
+                        keyboard=keyboard)
+
+
+async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    data = get_cryptocurrency_data_by_symbol(get_data(), update.message.text[1:])
+
+    if data is not None:
+        id, name, symbol = data['id'], data['name'], data['symbol']
+        keyboard = [
+            [InlineKeyboardButton("💰 Price", callback_data=f"price_{id}"),
+             InlineKeyboardButton("📈 Chart", callback_data=f"chart_{id}"),
+             InlineKeyboardButton("🌟 Add", callback_data=f"favorite-add_{id}") if id not in Favorites.get(update.message.from_user.id).split(",") else InlineKeyboardButton("🗑 Remove", callback_data=f"favorites-remove_{id}")],
+            [InlineKeyboardButton("🏠 Home", callback_data="home")]
+        ]
+
+        await send_message(
+            update=update,
+            text=f"Select <b>{name} ({symbol})</b> option 💬",
+            keyboard=keyboard,
+        )
+    else:
+        keyboard = [
+            [InlineKeyboardButton("🏠 Home", callback_data="home")],
+        ]
+        await send_message(
+            update=update,
+            text=f"Sorry, I can't find <b>{update.message.text[1:]}</b> 🔍\nTry again",
+            keyboard=keyboard,
+        )
+
+
 if __name__ == "__main__":
     app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(MessageHandler(filters.Regex('[$][A-Z]{1,}'), search))
 
     app.run_polling()
