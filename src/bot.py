@@ -107,6 +107,7 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
+    context.user_data["command"] = query.data
     if query.data.split("#")[0] in ["price", "chart", "favorites-add"]:
         await select_cryptocurrency(update, context)
     elif query.data.split("_")[0] == "price":
@@ -417,6 +418,8 @@ async def search_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.user_data.get("command", "") != "search": return
+    
     data = get_cryptocurrency_data_by_symbol(get_data(), update.message.text[1:])
 
     if data is not None:
