@@ -11,7 +11,6 @@ from crypto import get_data, get_prices
 from chart import get_chart
 from database import Favorites
 
-
 MENU_KEYBOARD = [
     [InlineKeyboardButton("💰 Price", callback_data="price#0-11"),
      InlineKeyboardButton("📈 Chart", callback_data="chart#0-11"),
@@ -70,29 +69,32 @@ async def reply_select_cryptocurrency(query, data: list):
     elif len(data) <= int(end):
         keyboard.append(
             [InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start) - 11}-{int(start)}"),
+             InlineKeyboardButton("🔍 Search", callback_data="search"),
              InlineKeyboardButton("🏠 Home", callback_data="home")]
         )
     elif int(start) > 0:
         keyboard.append(
             [InlineKeyboardButton("◀ Back", callback_data=f"{option}#{int(start) - 11}-{int(start)}"),
+             InlineKeyboardButton("🔍 Search", callback_data="search"),
              InlineKeyboardButton("🏠 Home", callback_data="home"),
              InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end) + 11}")]
         )
     else:
         keyboard.append(
-            [InlineKeyboardButton("🏠 Home", callback_data="home"),
-            InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end) + 11}")])
+            [InlineKeyboardButton("🔍 Search", callback_data="search"),
+             InlineKeyboardButton("🏠 Home", callback_data="home"),
+             InlineKeyboardButton("▶ Next", callback_data=f"{option}#{int(end)}-{int(end) + 11}")])
 
     await reply_query(
         query=query, text="Select cryptocurrency 💬", keyboard=keyboard
     )
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await reply_command(update=update,
-                       text=f"Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> "
-                            f"🤖💰\n\nSelect option 💬",
-                       keyboard=MENU_KEYBOARD)
+                        text="Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> "
+                             "🤖💰\n\nSelect option 💬",
+                        keyboard=MENU_KEYBOARD)
 
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -152,9 +154,9 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
                  InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_query(query=query,
-                        text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on "
-                             f"<b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
-                        keyboard=keyboard)
+                      text=f"<b>{name} ({symbol})</b> 💰\n\nPrice of <b>{symbol}</b> is <b>${price}</b> (changed on "
+                           f"<b>{percent}%</b> in 24 hrs) 💸{'📉' if percent[0] == '-' else '📈'}\n",
+                      keyboard=keyboard)
 
 
 async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -275,9 +277,9 @@ async def review(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                "to favorites to receive your personalized review 🧾")
 
     await reply_query(query=query,
-                        text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n"
-                             f"<i>{review}</i>",
-                        keyboard=keyboard)
+                      text=f"Review 📝\n<i>Prices of favorite cryptocurrencies at the current hour 💸</i>\n\n"
+                           f"<i>{review}</i>",
+                      keyboard=keyboard)
 
 
 def get_favorite_review(data, favorites):
@@ -316,16 +318,12 @@ async def alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def alarm_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [
-            InlineKeyboardButton("🕛 0:00", callback_data="alarm-on_0"),
-            InlineKeyboardButton("🕗 8:00", callback_data="alarm-on_8"),
-            InlineKeyboardButton("🕛 12:00", callback_data="alarm-on_12"),
-            InlineKeyboardButton("🕗 20:00", callback_data="alarm-on_20"),
-        ],
-        [
-            InlineKeyboardButton("◀ Back", callback_data="alarm"),
-            InlineKeyboardButton("🏠 Home", callback_data="home"),
-        ],
+        [InlineKeyboardButton("🕛 0:00", callback_data="alarm-on_0"),
+         InlineKeyboardButton("🕗 8:00", callback_data="alarm-on_8"),
+         InlineKeyboardButton("🕛 12:00", callback_data="alarm-on_12"),
+         InlineKeyboardButton("🕗 20:00", callback_data="alarm-on_20")],
+        [InlineKeyboardButton("◀ Back", callback_data="alarm"),
+         InlineKeyboardButton("🏠 Home", callback_data="home")]
     ]
 
     await reply_query(
@@ -343,7 +341,7 @@ async def alarm_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await enable_alarm(update, context)
     await reply_query(query=update.callback_query,
-                        text=f"Alarm is enabled on <i>{query.data.split('_')[-1]}:00</i> (UTC) ⏰", keyboard=keyboard)
+                      text=f"Alarm is enabled on <i>{query.data.split('_')[-1]}:00</i> (UTC) ⏰", keyboard=keyboard)
 
 
 async def enable_alarm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -381,10 +379,10 @@ async def alarmed_review(context: ContextTypes.DEFAULT_TYPE):
                                  favorites) if favorites else ("You don't have any favorite cryptocurrencies yet. Add "
                                                                "to favorites to receive your personalized review 🧾")
 
-    await send_alarm_message(context=context,
-                             text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour "
-                                  f"💸</i>\n\n<i>{review}</i>",
-                             keyboard=keyboard)
+    await reply_alarm(context=context,
+                      text=f"Daily Review 📝⏰\n<i>Prices of favorite cryptocurrencies at the current hour "
+                           f"💸</i>\n\n<i>{review}</i>",
+                      keyboard=keyboard)
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -395,17 +393,17 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await reply_query(query=query,
-                        text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your "
-                             f"personal cryptocurrency checker bot, made with ❤ on 🐍 by @m3r1v3 🤖💰</i>\n\n"
-                             f"What can I do?\n\n"
-                             f"<i> 💰 Show the current cryptocurrency prices\n"
-                             f" 📈 Show cryptocurrency price chart for the last 30 days\n"
-                             f" 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to "
-                             f"favorites\n"
-                             f" 🔔 Make review for you in specified time\n"
-                             f"...and other features that we will make in the future ✨</i>\n\n"
-                             f"Check prices, make charts with me. With <b>Cryptifica</b> 🤖",
-                        keyboard=keyboard)
+                      text=f"About <b>Cryptifica</b> ℹ\n\nHey, {query.from_user.first_name} 👋🏻\n<i>I'm your "
+                           f"personal cryptocurrency checker bot, made with ❤ on 🐍 by @m3r1v3 🤖💰</i>\n\n"
+                           f"What can I do?\n\n"
+                           f"<i> 💰 Show the current cryptocurrency prices\n"
+                           f" 📈 Show cryptocurrency price chart for the last 30 days\n"
+                           f" 📝 Make review for your favorite cryptocurrencies\n ⭐ Save your cryptocurrencies to "
+                           f"favorites\n"
+                           f" 🔔 Make review for you in specified time\n"
+                           f"...and other features that we will make in the future ✨</i>\n\n"
+                           f"Check prices, make charts with me. With <b>Cryptifica</b> 🤖",
+                      keyboard=keyboard)
 
 
 async def search_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -414,8 +412,8 @@ async def search_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await reply_query(query=update.callback_query,
-                        text="Send symbol of cryptocurrency (like $BTC or $ETH) to do someting with it 🔍",
-                        keyboard=keyboard)
+                      text="Send symbol of cryptocurrency (like $BTC or $ETH) to do someting with it 🔍",
+                      keyboard=keyboard)
 
 
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -426,20 +424,19 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton("💰 Price", callback_data=f"price_{id}"),
              InlineKeyboardButton("📈 Chart", callback_data=f"chart_{id}"),
-             InlineKeyboardButton("🌟 Add", callback_data=f"favorite-add_{id}") if id not in Favorites.get(update.message.from_user.id).split(",") else InlineKeyboardButton("🗑 Remove", callback_data=f"favorites-remove_{id}")],
+             InlineKeyboardButton("🌟 Add", callback_data=f"favorite-add_{id}") if id not in Favorites.get(
+                 update.message.from_user.id).split(",")
+             else InlineKeyboardButton("🗑 Remove", callback_data=f"favorites-remove_{id}")],
             [InlineKeyboardButton("🏠 Home", callback_data="home")]
         ]
 
-        await send_message(
+        await reply_command(
             update=update,
             text=f"Select <b>{name} ({symbol})</b> option 💬",
-            keyboard=keyboard,
-        )
+            keyboard=keyboard)
     else:
-        keyboard = [
-            [InlineKeyboardButton("🏠 Home", callback_data="home")],
-        ]
-        await send_message(
+        keyboard = [[InlineKeyboardButton("🏠 Home", callback_data="home")]]
+        await reply_command(
             update=update,
             text=f"Sorry, I can't find <b>{update.message.text[1:]}</b> 🔍\nTry again",
             keyboard=keyboard,
