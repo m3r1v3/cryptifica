@@ -148,7 +148,7 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
     price, percent = data['priceUsd'], '{0:.{1}f}'.format(float(data['changePercent24Hr']), 4)
 
-    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price#0-9"),
+    keyboard = [[InlineKeyboardButton("◀ Back", callback_data="price#0-11"),
                  InlineKeyboardButton("🏠 Home", callback_data="home")]]
 
     await reply_query(query=query,
@@ -170,7 +170,7 @@ async def chart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name, symbol = data['name'], data['symbol']
 
     keyboard = [
-        [InlineKeyboardButton("◀ Back", callback_data="chart#0-9"),
+        [InlineKeyboardButton("◀ Back", callback_data="chart#0-11"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
@@ -192,8 +192,8 @@ def delete_image(file_name: str):
 
 async def favorites(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🌟 Add", callback_data="favorites-add#0-9"),
-         InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove#0-9"),
+        [InlineKeyboardButton("🌟 Add", callback_data="favorites-add#0-11"),
+         InlineKeyboardButton("🗑 Remove", callback_data="favorites-remove#0-11"),
          InlineKeyboardButton("🏠 Home", callback_data="home")],
     ]
 
