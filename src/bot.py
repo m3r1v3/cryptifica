@@ -22,7 +22,7 @@ MENU_KEYBOARD = [
 ]
 
 
-async def reply_command(update: Update, text: str, keyboard: list):
+async def reply_update(update: Update, text: str, keyboard: list):
     await update.message.reply_text(text=text,
                                     parse_mode=ParseMode.HTML,
                                     reply_markup=InlineKeyboardMarkup(keyboard))
@@ -91,10 +91,10 @@ async def reply_select_cryptocurrency(query, data: list):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await reply_command(update=update,
-                        text="Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> "
-                             "🤖💰\n\nSelect option 💬",
-                        keyboard=MENU_KEYBOARD)
+    await reply_update(update=update,
+                       text="Welcome to <b>Cryptifica</b> 👋🏻\n<i>Your personal cryptocurrency checker bot</i> "
+                            "🤖💰\n\nSelect option 💬",
+                       keyboard=MENU_KEYBOARD)
 
 
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -419,7 +419,7 @@ async def search_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data.get("command", "") != "search": return
-    
+
     data = get_cryptocurrency_data_by_symbol(get_data(), update.message.text[1:])
 
     if data is not None:
@@ -433,13 +433,13 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🏠 Home", callback_data="home")]
         ]
 
-        await reply_command(
+        await reply_update(
             update=update,
             text=f"Select <b>{name} ({symbol})</b> option 💬",
             keyboard=keyboard)
     else:
         keyboard = [[InlineKeyboardButton("🏠 Home", callback_data="home")]]
-        await reply_command(
+        await reply_update(
             update=update,
             text=f"Sorry, I can't find <b>{update.message.text[1:]}</b> 🔍\nTry again",
             keyboard=keyboard,
