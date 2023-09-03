@@ -38,3 +38,8 @@ python src\bot.py</code>
 . venv/Scripts/activate
 python src/bot.py</code>
 </pre>
+<h3>Environment Variables 📃</h3>
+<table>
+    <tr><td>BOT_TOKEN</td><td>Telegram bot token</td></tr>
+    <tr><td>DATABASE_URL</td><td>SQL Database URL</td><td>2.0.16</td></tr>
+</table>
