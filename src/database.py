@@ -8,6 +8,10 @@ from sqlalchemy.orm import mapped_column
 engine = create_engine(os.environ.get('DATABASE_URL'))
 
 
+def create_db():
+    Base.metadata.create_engine(engine)
+
+
 class Base(DeclarativeBase):
     pass
 

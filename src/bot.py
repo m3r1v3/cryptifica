@@ -11,6 +11,8 @@ from crypto import get_data, get_prices
 from chart import get_chart
 from database import Favorites
 
+from database import create_db
+
 MENU_KEYBOARD = [
     [InlineKeyboardButton("💰 Price", callback_data="price#0-11"),
      InlineKeyboardButton("📈 Chart", callback_data="chart#0-11"),
@@ -447,6 +449,8 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == "__main__":
+    create_db()
+
     app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
     app.add_handler(CommandHandler("start", start))
