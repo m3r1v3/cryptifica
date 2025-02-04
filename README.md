@@ -20,7 +20,8 @@
     <tr><td>Telegram API</td><td>python-telegram-bot</td><td>20.3</td></tr>
     <tr><td>Database ORM</td><td>SQLAlchemy</td><td>2.0.16</td></tr>
     <tr><td>Graphing</td><td>Plotly</td><td>5.15.0</td></tr>    
-    <tr><td>Virtual environment</td><td>virtualenv</td><td>20.23.0</td></tr>    
+    <tr><td>HTTP</td><td>Requests</td><td>2.32.2</td></tr>    
+    <tr><td>Virtual environment</td><td>virtualenv</td><td>20.23.0</td></tr>
 </table>
 <h3>How to run 🚀</h3>
 <p>
